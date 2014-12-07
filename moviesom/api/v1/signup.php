@@ -4,7 +4,8 @@
    * Expects JSON as payload I.e.:
    *  {
    *    "username": "john@doe.nl",
-   *    "password": "thesecret"
+   *    "password": "thesecret",
+   *    "password2": "thesecret"
    *  }
    */
 
@@ -17,7 +18,12 @@
   
   $requestJson = json_decode(file_get_contents("php://input"), true);
   
-  if (isset($requestJson['username']) && isset($requestJson['password'])) {
+  /**
+   * Check if all required values exist and password and password2 are the same.
+   */
+  if (isset($requestJson['username']) && isset($requestJson['password'])
+      && strlen($requestJson['password']) > 8 && isset($requestJson['password2'])
+      && strcmp($requestJson['password'], $requestJson['password2']) == 0) {
     $bCryptPw = password_hash($requestJson['password'], PASSWORD_BCRYPT, array("cost" => 10));
     try {
       $dbh = $db->connect();
