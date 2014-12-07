@@ -34,7 +34,7 @@
     
     // All fields should be set and new-password and new-password2 should be the same.
     if (isset($requestJson['username']) && isset($requestJson['password']) &&
-        isset($requestJson['new-password']) && isset($requestJson['new-password2']) &&
+        isset($requestJson['new-password']) && strlen($requestJson['new-password']) >= 8 && isset($requestJson['new-password2']) &&
         strcmp($requestJson['new-password'], $requestJson['new-password2']) == 0 ) {
       $bCryptPw = password_hash($requestJson['new-password'], PASSWORD_BCRYPT, array("cost" => 10));
       try {

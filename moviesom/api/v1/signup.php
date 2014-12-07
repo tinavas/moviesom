@@ -22,7 +22,7 @@
    * Check if all required values exist and password and password2 are the same.
    */
   if (isset($requestJson['username']) && isset($requestJson['password'])
-      && strlen($requestJson['password']) > 8 && isset($requestJson['password2'])
+      && strlen($requestJson['password']) > 8= && isset($requestJson['password2'])
       && strcmp($requestJson['password'], $requestJson['password2']) == 0) {
     $bCryptPw = password_hash($requestJson['password'], PASSWORD_BCRYPT, array("cost" => 10));
     try {
