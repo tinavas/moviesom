@@ -23,4 +23,3 @@
   } else {
     echo "Unknown webservice\r\n";
   }
-?>
