@@ -3,7 +3,9 @@
   ini_set("display_errors", 1);
   require 'vendor/autoload.php';
   
-  $elasticaClient = new \Elastica\Client();
+  $elasticaClient = new \Elastica\Client(array(
+    'host' => '127.0.0.1'
+  ));
   
   // Load index
   $elasticaIndex = $elasticaClient->getIndex('indexname');
