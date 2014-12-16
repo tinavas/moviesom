@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.0.10
+-- version 4.1.13
 -- http://www.phpmyadmin.net
 --
--- Host: 127.0.0.1
--- Generation Time: Dec 10, 2014 at 10:42 PM
--- Server version: 5.5.24-log
--- PHP Version: 5.6.0
+-- Host: localhost
+-- Generation Time: Dec 16, 2014 at 08:23 PM
+-- Server version: 5.5.36
+-- PHP Version: 5.5.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `contents` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=109 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -45,7 +45,22 @@ CREATE TABLE IF NOT EXISTS `content_fields` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_id_2` (`content_id`,`name`),
   KEY `content_id` (`content_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4044 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `login_tokens`
+--
+
+CREATE TABLE IF NOT EXISTS `login_tokens` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `ip` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`,`ip`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 -- --------------------------------------------------------
 
@@ -62,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `page_settings` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`,`page_md5`),
   UNIQUE KEY `name_2` (`name`,`page_md5`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=30 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -80,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
 
 -- --------------------------------------------------------
 
@@ -98,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `widgets` (
   KEY `page` (`page`(255)),
   KEY `parent_id` (`parent_id`),
   KEY `pos` (`pos`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=356 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
