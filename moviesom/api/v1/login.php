@@ -34,7 +34,7 @@
         if ($dbh->inTransaction() === false) {
           $dbh->beginTransaction();
         }
-        $token = hash("sha512", password_hash(mt_rand() . uniqid("moviesomUID_", true), PASSWORD_BCRYPT, array("cost" => 10)));
+        $token = $credentials ->generateNewLoginToken();
         $userId = $credentials->getUserId();
         $stmt = $dbh->prepare("INSERT login_tokens (user_id, token, ip) VALUES (:user_id, :token, :ip) ON DUPLICATE KEY UPDATE token=:token");
         $stmt->bindParam(":user_id", $userId);

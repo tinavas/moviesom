@@ -37,9 +37,18 @@
       $stmt->bindParam(":password", $bCryptPw);
       $stmt->execute();
       
+      $token = $credentials ->generateNewLoginToken();
+      $stmt = $dbh->prepare("INSERT login_tokens (user_id, token, ip) VALUES ((SELECT id FROM users WHERE username=:username AND password=:password LIMIT 1), :token, :ip) ON DUPLICATE KEY UPDATE token=:token");
+      $stmt->bindParam(":username", $requestJson["username"]);
+      $stmt->bindParam(":password", $bCryptPw);
+      $stmt->bindParam(":token", $token);
+      $stmt->bindParam(":ip", $_SERVER['REMOTE_ADDR']);
+      $stmt->execute();
+      
       if($dbh->commit()) {
         header('HTTP/1.1 200 OK');
         $response['status'] = 200;
+        $response['loginToken'] = $token;
       } else {
         $response['message'] = '';
       }
