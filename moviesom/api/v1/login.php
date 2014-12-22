@@ -15,7 +15,7 @@
   $requestJson = json_decode(file_get_contents("php://input"), true);
   // Credentials should be valid.
   if(isset($requestJson['token']) && strlen($requestJson['token']) > 0) {
-    $credentials->checkLoginToken($requestJson['token'], $_SERVER['REMOTE_ADDR']);
+    $credentials->checkLoginToken($requestJson['token']);
   } else {
     $credentials->checkCredentials($requestJson['username'], $requestJson['password']);
   }
