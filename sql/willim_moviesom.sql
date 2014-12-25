@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.1.13
+-- version 4.0.10
 -- http://www.phpmyadmin.net
 --
--- Host: localhost
--- Generation Time: Dec 16, 2014 at 08:23 PM
--- Server version: 5.5.36
--- PHP Version: 5.5.8
+-- Host: 127.0.0.1
+-- Generation Time: Dec 26, 2014 at 12:35 AM
+-- Server version: 5.5.24-log
+-- PHP Version: 5.6.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `contents` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=111 ;
 
 -- --------------------------------------------------------
 
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `content_fields` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_id_2` (`content_id`,`name`),
   KEY `content_id` (`content_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4073 ;
 
 -- --------------------------------------------------------
 
@@ -60,7 +60,57 @@ CREATE TABLE IF NOT EXISTS `login_tokens` (
   `ip` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`ip`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=38 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `movies`
+--
+
+CREATE TABLE IF NOT EXISTS `movies` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `title` varchar(256) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `title` (`title`(255))
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `movie_ratings`
+--
+
+CREATE TABLE IF NOT EXISTS `movie_ratings` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `movie_id` bigint(20) NOT NULL,
+  `source_id` varchar(32) NOT NULL,
+  `rating` float DEFAULT NULL,
+  `votes` int(11) DEFAULT NULL,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `movie_id` (`movie_id`,`source_id`),
+  KEY `rating` (`rating`),
+  KEY `voters` (`votes`),
+  KEY `updated` (`updated`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `movie_sources`
+--
+
+CREATE TABLE IF NOT EXISTS `movie_sources` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `movie_id` bigint(20) NOT NULL,
+  `tmdb_id` int(11) NOT NULL,
+  `imdb_id` varchar(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `movie_id` (`movie_id`),
+  UNIQUE KEY `tmdb_id` (`tmdb_id`),
+  UNIQUE KEY `imdb_id` (`imdb_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
 
 -- --------------------------------------------------------
 
@@ -77,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `page_settings` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`,`page_md5`),
   UNIQUE KEY `name_2` (`name`,`page_md5`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=36 ;
 
 -- --------------------------------------------------------
 
@@ -95,7 +145,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 -- --------------------------------------------------------
 
@@ -113,7 +163,7 @@ CREATE TABLE IF NOT EXISTS `widgets` (
   KEY `page` (`page`(255)),
   KEY `parent_id` (`parent_id`),
   KEY `pos` (`pos`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=358 ;
 
 -- --------------------------------------------------------
 
