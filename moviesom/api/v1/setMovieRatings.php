@@ -5,6 +5,7 @@
    *  {
    *    "title": "Fight Club"
    *    "tmdb_id": 7468,
+   *    "release_date": "1999-10-14",
    *    "tmdb_rating": 6,
    *    "tmdb_votes": 1000,
    *    "imdb_id": "tt0137523",
@@ -22,7 +23,7 @@
   
   $requestJson = json_decode(file_get_contents("php://input"), true);
 
-  if (isset($requestJson['title']) && 
+  if (isset($requestJson['title']) && isset($requestJson['release_date']) && 
       isset($requestJson['tmdb_id']) && isset($requestJson['imdb_id']) &&
       isset($requestJson['tmdb_rating']) && isset($requestJson['imdb_rating']) && 
       isset($requestJson['tmdb_votes']) && isset($requestJson['imdb_votes'])) {
@@ -47,8 +48,9 @@
       // We create the movie to obtain a movie id if it doesn't exist already.
       if(isset($movie_id) === false) {
         // Insert record into movies
-        $stmt = $dbh->prepare("INSERT INTO movies (title) VALUES (:title)");
+        $stmt = $dbh->prepare("INSERT INTO movies (title, release_date) VALUES (:title, :release_date)");
         $stmt->bindParam(":title", $requestJson["title"]);
+        $stmt->bindParam(":release_date", $requestJson["release_date"]);
         $stmt->execute();
         $movie_id = $dbh->lastInsertId();
       }
