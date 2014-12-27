@@ -40,7 +40,7 @@
       $stmt->execute();
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $movieExists = true;
-        $movie_id = $row["id"];
+        $movie_id = $row["movie_id"];
         break;
       }
 
