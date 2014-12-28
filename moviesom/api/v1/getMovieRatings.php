@@ -3,9 +3,18 @@
    * Get movie ratings.
    * Expects JSON as payload I.e.:
    *  {
-   *    "id": 1234,
-   *    "tmdb_id": "7468",
-   *    "tmdb_id": "tt0137523"
+   *    "ids": [
+   *      {id: "1"},
+   *      {id: "2"}
+   *    ],
+   *    "tmdb_ids": [
+   *      {id: "550"},
+   *      {id: "289732"}
+   *    ],
+   *    "imdb_ids": [
+   *      {id: "tt0137523"},
+   *      {id: "tt3560742"}
+   *    ]
    *  }
    */
 
@@ -18,17 +27,38 @@
   
   $requestJson = json_decode(file_get_contents("php://input"), true);
   
-  if (isset($requestJson['id']) || isset($requestJson['tmdb_id']) || isset($requestJson['imdb_id'])) {
+  // We need at least one of the following arrays in order to proceed with searching.
+  if (isset($requestJson['ids']) || isset($requestJson['tmdb_ids']) || isset($requestJson['imdb_ids'])) {
+    // If any of the request variables aren't defined then we create an empty one.
+    if(isset($requestJson['ids']) == false) $requestJson['ids'] = [];
+    if(isset($requestJson['tmdb_ids']) == false) $requestJson['tmdb_ids'] = [];
+    if(isset($requestJson['imdb_ids']) == false) $requestJson['imdb_ids'] = [];
     try {
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       if ($dbh->inTransaction() === false) {
         $dbh->beginTransaction();
       }
-      $stmt = $dbh->prepare("SELECT * FROM movie_ratings WHERE movie_id=(SELECT m.id FROM movies AS m JOIN movie_sources AS ms ON ms.movie_id=m.id WHERE m.id=:id OR ms.tmdb_id=:tmdb_id OR ms.imdb_id=:imdb_id GROUP BY m.id LIMIT 1)");
-      $stmt->bindParam(":id", $requestJson["id"]);
-      $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
-      $stmt->bindParam(":imdb_id", $requestJson["imdb_id"]);
+      $idsWhereIn = implode(',', array_fill(0, count($requestJson['ids']), '?'));
+      if(strlen($idsWhereIn) == 0) $idsWhereIn = "NULL";
+      $tmdbWhereIn = implode(',', array_fill(0, count($requestJson['tmdb_ids']), '?'));
+      if(strlen($tmdbWhereIn) == 0) $tmdbWhereIn = "NULL";
+      $imdbWhereIn = implode(',', array_fill(0, count($requestJson['imdb_ids']), '?'));
+      if(strlen($imdbWhereIn) == 0) $imdbWhereIn = "NULL";
+      $stmt = $dbh->prepare("SELECT * FROM movie_ratings AS mr JOIN movie_sources AS ms ON ms.movie_id=mr.movie_id WHERE mr.movie_id IN(SELECT m.id FROM movies AS m JOIN movie_sources AS ms ON ms.movie_id=m.id WHERE m.id IN({$idsWhereIn}) OR ms.tmdb_id IN({$tmdbWhereIn}) OR ms.imdb_id IN({$imdbWhereIn}))");
+      $pos = 0;
+      foreach ($requestJson['ids'] as $k => $id) {
+        $pos++;
+        $stmt->bindValue($pos, $id["id"]);
+      }
+      foreach ($requestJson['tmdb_ids'] as $k => $id) {
+        $pos++;
+        $stmt->bindValue($pos, $id["id"]);
+      }
+      foreach ($requestJson['imdb_ids'] as $k => $id) {
+        $pos++;
+        $stmt->bindValue($pos, $id["id"]);
+      }
       $stmt->execute();
       $ratings = [];
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
