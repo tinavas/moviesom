@@ -2,10 +2,10 @@
 -- version 4.0.10
 -- http://www.phpmyadmin.net
 --
--- Host: 127.0.0.1
--- Generation Time: Dec 26, 2014 at 12:35 AM
--- Server version: 5.5.24-log
--- PHP Version: 5.6.0
+-- Machine: 127.0.0.1
+-- Genereertijd: 28 dec 2014 om 01:08
+-- Serverversie: 5.5.24-log
+-- PHP-versie: 5.6.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,24 +17,24 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Database: `willim_moviesom`
+-- Databank: `willim_moviesom`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `contents`
+-- Tabelstructuur voor tabel `contents`
 --
 
 CREATE TABLE IF NOT EXISTS `contents` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=111 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `content_fields`
+-- Tabelstructuur voor tabel `content_fields`
 --
 
 CREATE TABLE IF NOT EXISTS `content_fields` (
@@ -45,12 +45,12 @@ CREATE TABLE IF NOT EXISTS `content_fields` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_id_2` (`content_id`,`name`),
   KEY `content_id` (`content_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4073 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `login_tokens`
+-- Tabelstructuur voor tabel `login_tokens`
 --
 
 CREATE TABLE IF NOT EXISTS `login_tokens` (
@@ -60,25 +60,26 @@ CREATE TABLE IF NOT EXISTS `login_tokens` (
   `ip` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`ip`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=38 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `movies`
+-- Tabelstructuur voor tabel `movies`
 --
 
 CREATE TABLE IF NOT EXISTS `movies` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `title` varchar(256) NOT NULL,
+  `release_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `title` (`title`(255))
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `movie_ratings`
+-- Tabelstructuur voor tabel `movie_ratings`
 --
 
 CREATE TABLE IF NOT EXISTS `movie_ratings` (
@@ -98,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `movie_ratings` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `movie_sources`
+-- Tabelstructuur voor tabel `movie_sources`
 --
 
 CREATE TABLE IF NOT EXISTS `movie_sources` (
@@ -115,7 +116,7 @@ CREATE TABLE IF NOT EXISTS `movie_sources` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `page_settings`
+-- Tabelstructuur voor tabel `page_settings`
 --
 
 CREATE TABLE IF NOT EXISTS `page_settings` (
@@ -127,12 +128,12 @@ CREATE TABLE IF NOT EXISTS `page_settings` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`,`page_md5`),
   UNIQUE KEY `name_2` (`name`,`page_md5`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=36 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Tabelstructuur voor tabel `users`
 --
 
 CREATE TABLE IF NOT EXISTS `users` (
@@ -150,7 +151,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `widgets`
+-- Tabelstructuur voor tabel `widgets`
 --
 
 CREATE TABLE IF NOT EXISTS `widgets` (
@@ -163,12 +164,12 @@ CREATE TABLE IF NOT EXISTS `widgets` (
   KEY `page` (`page`(255)),
   KEY `parent_id` (`parent_id`),
   KEY `pos` (`pos`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=358 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `widget_content`
+-- Tabelstructuur voor tabel `widget_content`
 --
 
 CREATE TABLE IF NOT EXISTS `widget_content` (
