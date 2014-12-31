@@ -39,11 +39,11 @@
       if ($dbh->inTransaction() === false) {
         $dbh->beginTransaction();
       }
-      $idsWhereIn = implode(',', array_fill(0, count($requestJson['ids']), '?'));
+      $idsWhereIn = (count($requestJson['ids'])) ? implode(',', array_fill(0, count($requestJson['ids']), '?')) : "";
       if(strlen($idsWhereIn) == 0) $idsWhereIn = "NULL";
-      $tmdbWhereIn = implode(',', array_fill(0, count($requestJson['tmdb_ids']), '?'));
+      $tmdbWhereIn = (count($requestJson['tmdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tmdb_ids']), '?')): "";
       if(strlen($tmdbWhereIn) == 0) $tmdbWhereIn = "NULL";
-      $imdbWhereIn = implode(',', array_fill(0, count($requestJson['imdb_ids']), '?'));
+      $imdbWhereIn = (count($requestJson['imdb_ids'])) ? implode(',', array_fill(0, count($requestJson['imdb_ids']), '?')) : "";
       if(strlen($imdbWhereIn) == 0) $imdbWhereIn = "NULL";
       $stmt = $dbh->prepare("SELECT * FROM movie_ratings AS mr JOIN movie_sources AS ms ON ms.movie_id=mr.movie_id WHERE mr.movie_id IN(SELECT m.id FROM movies AS m JOIN movie_sources AS ms ON ms.movie_id=m.id WHERE m.id IN({$idsWhereIn}) OR ms.tmdb_id IN({$tmdbWhereIn}) OR ms.imdb_id IN({$imdbWhereIn}))");
       $pos = 0;
