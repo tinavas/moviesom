@@ -19,7 +19,4 @@
   header('HTTP/1.1 200 OK');
   $response['status'] = 200;
   
-  $response['execTime'] = $execTime->getTime();
-  echo json_encode($response);
-  
 ?>

@@ -18,8 +18,18 @@
   }
 
   $files = scandir(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'moviesom' . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR . $version);
-  if(in_array($_REQUEST['service'] . '.php', $files)) {
-    require(dirname(__FILE__)  . DIRECTORY_SEPARATOR . 'moviesom' . DIRECTORY_SEPARATOR . "api" . DIRECTORY_SEPARATOR . $version . DIRECTORY_SEPARATOR . $_REQUEST['service'] . ".php");
+  $services = explode(",", $_REQUEST['service']);
+  array_walk($services, function(&$value, $key) { $value .= '.php'; });
+  $services = array_intersect($services, $files);
+  $multiResponse = [];
+  if(sizeof($services) > 0) {
+    foreach($services as $service) {
+      require(dirname(__FILE__)  . DIRECTORY_SEPARATOR . 'moviesom' . DIRECTORY_SEPARATOR . "api" . DIRECTORY_SEPARATOR . $version . DIRECTORY_SEPARATOR . $service);
+      $multiResponse[str_ireplace(".php", "", $service)] = $response;
+    }
+    $multiResponse['execTime'] = $execTime->getTime();
+
+    echo json_encode($multiResponse);
   } else {
     echo "Unknown webservice\r\n";
   }
