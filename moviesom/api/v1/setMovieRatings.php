@@ -65,8 +65,8 @@
       $stmt->bindParam(":movie_id", $movie_id);
       $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
       $stmt->bindParam(":imdb_id", $requestJson["imdb_id"]);
-      $stmt->bindParam(":tmdb_rating", $requestJson["tmdb_rating"]);
-      $stmt->bindParam(":imdb_rating", $requestJson["imdb_rating"]);
+      $stmt->bindParam(":tmdb_rating", $requestJson["tmdb_rating"], PDO::PARAM_STR);
+      $stmt->bindParam(":imdb_rating", $requestJson["imdb_rating"], PDO::PARAM_STR);
       $stmt->bindParam(":tmdb_votes", $requestJson["tmdb_votes"], PDO::PARAM_INT);
       $stmt->bindParam(":imdb_votes", $requestJson["imdb_votes"], PDO::PARAM_INT);
       $stmt->execute();
