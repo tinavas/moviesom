@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Machine: 127.0.0.1
--- Genereertijd: 28 dec 2014 om 01:08
+-- Genereertijd: 03 jan 2015 om 22:10
 -- Serverversie: 5.5.24-log
 -- PHP-versie: 5.6.0
 
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `login_tokens` (
   `ip` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`ip`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=329 ;
 
 -- --------------------------------------------------------
 
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `movies` (
   `release_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `title` (`title`(255))
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=30 ;
 
 -- --------------------------------------------------------
 
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS `movie_ratings` (
   KEY `rating` (`rating`),
   KEY `voters` (`votes`),
   KEY `updated` (`updated`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=247 ;
 
 -- --------------------------------------------------------
 
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS `movie_sources` (
   UNIQUE KEY `movie_id` (`movie_id`),
   UNIQUE KEY `tmdb_id` (`tmdb_id`),
   UNIQUE KEY `imdb_id` (`imdb_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=124 ;
 
 -- --------------------------------------------------------
 
@@ -147,6 +147,34 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `users_movies`
+--
+
+CREATE TABLE IF NOT EXISTS `users_movies` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `movie_id` bigint(20) NOT NULL,
+  `tmdb_id` int(11) NOT NULL,
+  `imdb_id` varchar(32) NOT NULL,
+  `watched` int(11) NOT NULL,
+  `blu_ray` tinyint(1) NOT NULL,
+  `dvd` tinyint(1) NOT NULL,
+  `digital` tinyint(1) NOT NULL,
+  `other` tinyint(1) NOT NULL,
+  `lend_out` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`,`movie_id`,`tmdb_id`,`imdb_id`),
+  KEY `watched` (`watched`),
+  KEY `blu_ray` (`blu_ray`),
+  KEY `dvd` (`dvd`),
+  KEY `digital` (`digital`),
+  KEY `other` (`other`),
+  KEY `lend_out` (`lend_out`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
 
 -- --------------------------------------------------------
 
