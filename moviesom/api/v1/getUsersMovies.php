@@ -4,9 +4,18 @@
    * Expects JSON as payload I.e.:
    *  {
    *    "token": "d967a19940bdc4d498d0420a9fb12802ab5857a0a634ab73ae8984c5cf46ab3f9322dd5c1c3f069cc9d226ce47112747976c289cf6ae7b41a8ac72a7dc69c83f",
-   *    "movie_id": 1,
-   *    "tmdb_id": 550,
-   *    "imdb_id": "tt0137523"
+   *    "movie_ids": [
+   *      {id: "1"},
+   *      {id: "2"}
+   *    ],
+   *    "tmdb_ids": [
+   *      {id: "550"},
+   *      {id: "289732"}
+   *    ],
+   *    "imdb_ids": [
+   *      {id: "tt0137523"},
+   *      {id: "tt3560742"}
+   *    ]
    *  }
    */
 
@@ -30,19 +39,38 @@
     header('HTTP/1.1 401 Unauthorized');
     $response['message'] = 'Insufficient rights';
     $response['status'] = 401;
-  } else if (isset($requestJson['movie_id']) || isset($requestJson['tmdb_id']) || isset($requestJson['imdb_id'])) {
+  } else if (isset($requestJson['movie_ids']) || isset($requestJson['tmdb_ids']) || isset($requestJson['imdb_ids'])) {
+    // If any of the request variables aren't defined then we create an empty one.
+    if(isset($requestJson['movie_ids']) == false) $requestJson['movie_ids'] = [];
+    if(isset($requestJson['tmdb_ids']) == false) $requestJson['tmdb_ids'] = [];
+    if(isset($requestJson['imdb_ids']) == false) $requestJson['imdb_ids'] = [];
     try {
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       if ($dbh->inTransaction() === false) {
         $dbh->beginTransaction();
       }
-      $stmt = $dbh->prepare("SELECT * FROM users_movies WHERE user_id=:user_id AND (movie_id=:movie_id OR tmdb_id=:tmdb_id OR imdb_id=:imdb_id)");
-      $pos = 0;
-      $stmt->bindParam(":user_id", $userId);
-      $stmt->bindParam(":movie_id", $requestJson["movie_id"]);
-      $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
-      $stmt->bindParam(":imdb_id", $requestJson["imdb_id"]);
+      $movieWhereIn = (count($requestJson['movie_ids'])) ? implode(',', array_fill(0, count($requestJson['movie_ids']), '?')) : "";
+      if(strlen($movieWhereIn) == 0) $movieWhereIn = "NULL";
+      $tmdbWhereIn = (count($requestJson['tmdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tmdb_ids']), '?')): "";
+      if(strlen($tmdbWhereIn) == 0) $tmdbWhereIn = "NULL";
+      $imdbWhereIn = (count($requestJson['imdb_ids'])) ? implode(',', array_fill(0, count($requestJson['imdb_ids']), '?')) : "";
+      if(strlen($imdbWhereIn) == 0) $imdbWhereIn = "NULL";
+      $stmt = $dbh->prepare("SELECT * FROM users_movies WHERE user_id=? AND (movie_id IN({$movieWhereIn}) OR tmdb_id IN({$tmdbWhereIn}) OR imdb_id IN({$imdbWhereIn}))");
+      $stmt->bindValue(1, $userId);
+      $pos = 1;
+      foreach ($requestJson['movie_ids'] as $k => $id) {
+        $pos++;
+        $stmt->bindValue($pos, $id["id"]);
+      }
+      foreach ($requestJson['tmdb_ids'] as $k => $id) {
+        $pos++;
+        $stmt->bindValue($pos, $id["id"]);
+      }
+      foreach ($requestJson['imdb_ids'] as $k => $id) {
+        $pos++;
+        $stmt->bindValue($pos, $id["id"]);
+      }
       $stmt->execute();
       $usersMovies = [];
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {

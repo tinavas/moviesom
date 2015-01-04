@@ -3,7 +3,7 @@
    * Get movie ratings.
    * Expects JSON as payload I.e.:
    *  {
-   *    "ids": [
+   *    "movie_ids": [
    *      {id: "1"},
    *      {id: "2"}
    *    ],
@@ -28,9 +28,9 @@
   $requestJson = json_decode(file_get_contents("php://input"), true);
   
   // We need at least one of the following arrays in order to proceed with searching.
-  if (isset($requestJson['ids']) || isset($requestJson['tmdb_ids']) || isset($requestJson['imdb_ids'])) {
+  if (isset($requestJson['movie_ids']) || isset($requestJson['tmdb_ids']) || isset($requestJson['imdb_ids'])) {
     // If any of the request variables aren't defined then we create an empty one.
-    if(isset($requestJson['ids']) == false) $requestJson['ids'] = [];
+    if(isset($requestJson['movie_ids']) == false) $requestJson['movie_ids'] = [];
     if(isset($requestJson['tmdb_ids']) == false) $requestJson['tmdb_ids'] = [];
     if(isset($requestJson['imdb_ids']) == false) $requestJson['imdb_ids'] = [];
     try {
@@ -39,7 +39,7 @@
       if ($dbh->inTransaction() === false) {
         $dbh->beginTransaction();
       }
-      $idsWhereIn = (count($requestJson['ids'])) ? implode(',', array_fill(0, count($requestJson['ids']), '?')) : "";
+      $idsWhereIn = (count($requestJson['movie_ids'])) ? implode(',', array_fill(0, count($requestJson['movie_ids']), '?')) : "";
       if(strlen($idsWhereIn) == 0) $idsWhereIn = "NULL";
       $tmdbWhereIn = (count($requestJson['tmdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tmdb_ids']), '?')): "";
       if(strlen($tmdbWhereIn) == 0) $tmdbWhereIn = "NULL";
@@ -47,7 +47,7 @@
       if(strlen($imdbWhereIn) == 0) $imdbWhereIn = "NULL";
       $stmt = $dbh->prepare("SELECT * FROM movie_ratings AS mr JOIN movie_sources AS ms ON ms.movie_id=mr.movie_id WHERE mr.movie_id IN(SELECT m.id FROM movies AS m JOIN movie_sources AS ms ON ms.movie_id=m.id WHERE m.id IN({$idsWhereIn}) OR ms.tmdb_id IN({$tmdbWhereIn}) OR ms.imdb_id IN({$imdbWhereIn}))");
       $pos = 0;
-      foreach ($requestJson['ids'] as $k => $id) {
+      foreach ($requestJson['movie_ids'] as $k => $id) {
         $pos++;
         $stmt->bindValue($pos, $id["id"]);
       }
