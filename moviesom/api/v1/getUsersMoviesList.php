@@ -68,9 +68,7 @@
       
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $row["adult"] = false;
-        $row["backdrop_path"] = null;
         $row["original_title"] = null;
-        $row["poster_path"] = null;
         $row["popularity"] = null;
         $row["video"] = false;
         $row["id"] = $row["tmdb_id"];
