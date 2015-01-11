@@ -41,7 +41,7 @@
                                 "(runtime*LEAST(watched, 1)) AS movie_runtime, " .
                                 "(runtime*watched) AS time_watching_movies, " .
                                 "GREATEST(blu_ray,dvd,digital,other) AS owned " .
-                                "FROM movies AS m JOIN users_movies AS um ON um.movie_id=m.id WHERE um.user_id=:user_id) AS umm;");
+                                "FROM movies AS m JOIN users_movies AS um ON um.movie_id=m.id WHERE um.user_id=:user_id) AS umm");
       $stmt->bindParam(":user_id", $userId);
       $stmt->execute();
       $userStats = [];
