@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Machine: 127.0.0.1
--- Genereertijd: 03 jan 2015 om 22:10
+-- Genereertijd: 11 jan 2015 om 17:24
 -- Serverversie: 5.5.24-log
 -- PHP-versie: 5.6.0
 
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `contents` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `content_fields` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_id_2` (`content_id`,`name`),
   KEY `content_id` (`content_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `login_tokens` (
   `ip` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`ip`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=329 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -71,10 +71,13 @@ CREATE TABLE IF NOT EXISTS `login_tokens` (
 CREATE TABLE IF NOT EXISTS `movies` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `title` varchar(256) NOT NULL,
+  `runtime` int(11) DEFAULT NULL,
   `release_date` date DEFAULT NULL,
+  `backdrop_path` varchar(255) DEFAULT NULL,
+  `poster_path` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `title` (`title`(255))
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=30 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -94,7 +97,7 @@ CREATE TABLE IF NOT EXISTS `movie_ratings` (
   KEY `rating` (`rating`),
   KEY `voters` (`votes`),
   KEY `updated` (`updated`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=247 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -111,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `movie_sources` (
   UNIQUE KEY `movie_id` (`movie_id`),
   UNIQUE KEY `tmdb_id` (`tmdb_id`),
   UNIQUE KEY `imdb_id` (`imdb_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=124 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -128,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `page_settings` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`,`page_md5`),
   UNIQUE KEY `name_2` (`name`,`page_md5`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -146,7 +149,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -174,7 +177,7 @@ CREATE TABLE IF NOT EXISTS `users_movies` (
   KEY `digital` (`digital`),
   KEY `other` (`other`),
   KEY `lend_out` (`lend_out`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -192,7 +195,7 @@ CREATE TABLE IF NOT EXISTS `widgets` (
   KEY `page` (`page`(255)),
   KEY `parent_id` (`parent_id`),
   KEY `pos` (`pos`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
