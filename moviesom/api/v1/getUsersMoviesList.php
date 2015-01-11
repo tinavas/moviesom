@@ -42,18 +42,20 @@
       if ($dbh->inTransaction() === false) {
         $dbh->beginTransaction();
       }
+
+      $searchString = "%%";
+      if(isset($requestJson["query"])) {
+        $searchString = "%{$requestJson["query"]}%";
+      }
       
       // Get total count
-      $stmt = $dbh->prepare("SELECT COUNT(*) AS total_results FROM users_movies AS um WHERE um.user_id=:user_id AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0)");
+      $stmt = $dbh->prepare("SELECT COUNT(*) AS total_results FROM users_movies AS um JOIN movies AS m ON m.id=um.movie_id WHERE um.user_id=:user_id AND m.title LIKE :search_title AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0)");
       $stmt->bindParam(":user_id", $userId);
+      $stmt->bindParam(":search_title", $searchString, PDO::PARAM_STR);
       $stmt->execute();
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $response['total_results'] = intval($row["total_results"]);
         $response['total_pages'] = intval($row["total_results"]/$resultsPerPage);
-      }
-      $searchString = "%%";
-      if(isset($requestJson["query"])) {
-        $searchString = "%{$requestJson["query"]}%";
       }
       $stmt = $dbh->prepare("SELECT * FROM users_movies AS um JOIN movies AS m ON m.id=um.movie_id JOIN movie_ratings AS mr ON mr.movie_id=m.id WHERE um.user_id=:user_id AND m.title LIKE :search_title AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0) AND mr.source_id=um.tmdb_id ORDER BY m.title LIMIT :page, :results_per_page");
       $stmt->bindParam(":user_id", $userId);
