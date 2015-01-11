@@ -7,6 +7,8 @@
    *    "runtime": 139,
    *    "tmdb_id": 7468,
    *    "release_date": "1999-10-14",
+   *    "backdrop_path": "/nS0rEXPbkHI449SF6R4WUQvTVxE.jpg",
+   *    "poster_path": "/rLTdj7oB9oxsYwuweeglWRzRng7.jpg",
    *    "tmdb_rating": 6,
    *    "tmdb_votes": 1000,
    *    "imdb_id": "tt0137523",
@@ -25,6 +27,7 @@
   $requestJson = json_decode(file_get_contents("php://input"), true);
 
   if (isset($requestJson['title']) && isset($requestJson['runtime']) && isset($requestJson['release_date']) && 
+      isset($requestJson['backdrop_path']) && isset($requestJson['poster_path']) &&
       isset($requestJson['tmdb_id']) && isset($requestJson['imdb_id']) &&
       isset($requestJson['tmdb_rating']) && isset($requestJson['imdb_rating']) && 
       isset($requestJson['tmdb_votes']) && isset($requestJson['imdb_votes'])) {
@@ -49,17 +52,21 @@
       // We create the movie to obtain a movie id if it doesn't exist already.
       if(isset($movie_id) === false) {
         // Insert record into movies
-        $stmt = $dbh->prepare("INSERT INTO movies (title, runtime, release_date) VALUES (:title, :runtime, :release_date)");
+        $stmt = $dbh->prepare("INSERT INTO movies (title, runtime, release_date, backdrop_path, poster_path) VALUES (:title, :runtime, :release_date, :backdrop_path, :poster_path)");
         $stmt->bindParam(":title", $requestJson["title"]);
         $stmt->bindParam(":runtime", $requestJson["runtime"]);
         $stmt->bindParam(":release_date", $requestJson["release_date"]);
+        $stmt->bindParam(":backdrop_path", $requestJson["backdrop_path"]);
+        $stmt->bindParam(":poster_path", $requestJson["poster_path"]);
         $stmt->execute();
         $movie_id = $dbh->lastInsertId();
       } else {
-        $stmt = $dbh->prepare("UPDATE movies SET runtime=:runtime, release_date=:release_date WHERE id=:movie_id");
+        $stmt = $dbh->prepare("UPDATE movies SET runtime=:runtime, release_date=:release_date, backdrop_path=:backdrop_path, poster_path=:poster_path WHERE id=:movie_id");
         $stmt->bindParam(":runtime", $requestJson["runtime"]);
         $stmt->bindParam(":release_date", $requestJson["release_date"]);
         $stmt->bindParam(":movie_id", $movie_id);
+        $stmt->bindParam(":backdrop_path", $requestJson["backdrop_path"]);
+        $stmt->bindParam(":poster_path", $requestJson["poster_path"]);
         $stmt->execute();
       }
       
