@@ -32,13 +32,6 @@
       isset($requestJson['tmdb_rating']) && isset($requestJson['imdb_rating']) && 
       isset($requestJson['tmdb_votes']) && isset($requestJson['imdb_votes'])) {
     try {
-      if(strlen($requestJson['imdb_rating']) == 0) {
-        $requestJson['imdb_rating'] = 0;
-      }
-      if(strlen($requestJson['imdb_votes']) == 0) {
-        $requestJson['imdb_votes'] = 0;
-      }
-      
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       if ($dbh->inTransaction() === false) {
