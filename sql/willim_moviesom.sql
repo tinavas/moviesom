@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Machine: 127.0.0.1
--- Genereertijd: 11 jan 2015 om 17:24
+-- Genereertijd: 12 jan 2015 om 22:33
 -- Serverversie: 5.5.24-log
 -- PHP-versie: 5.6.0
 
@@ -164,6 +164,7 @@ CREATE TABLE IF NOT EXISTS `users_movies` (
   `tmdb_id` int(11) NOT NULL,
   `imdb_id` varchar(32) NOT NULL,
   `watched` int(11) NOT NULL,
+  `want_to_watch` tinyint(4) NOT NULL,
   `blu_ray` tinyint(1) NOT NULL,
   `dvd` tinyint(1) NOT NULL,
   `digital` tinyint(1) NOT NULL,
