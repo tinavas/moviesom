@@ -8,6 +8,7 @@
    *    "tmdb_id": 7468,
    *    "imdb_id": "tt0137523",
    *    "watched": "2",
+   *    "want_to_watch": 1,
    *    "blu_ray": 0,
    *    "dvd": 1,
    *    "digital": 0,
@@ -58,15 +59,16 @@
 
       // Insert the users movies settings
       $stmt = $dbh->prepare(
-        "INSERT INTO users_movies (user_id, movie_id, tmdb_id, imdb_id, watched, blu_ray, dvd, digital, other, lend_out)" .
-        " VALUES (:user_id, :movie_id, :tmdb_id, :imdb_id, :watched, :blu_ray, :dvd, :digital, :other, :lend_out)" .
-        " ON DUPLICATE KEY UPDATE watched=:watched, blu_ray=:blu_ray, dvd=:dvd, digital=:digital, other=:other, lend_out=:lend_out"
+        "INSERT INTO users_movies (user_id, movie_id, tmdb_id, imdb_id, watched, want_to_watch, blu_ray, dvd, digital, other, lend_out)" .
+        " VALUES (:user_id, :movie_id, :tmdb_id, :imdb_id, :watched, :want_to_watch, :blu_ray, :dvd, :digital, :other, :lend_out)" .
+        " ON DUPLICATE KEY UPDATE watched=:watched, want_to_watch=:want_to_watch, blu_ray=:blu_ray, dvd=:dvd, digital=:digital, other=:other, lend_out=:lend_out"
       );
       $stmt->bindParam(":user_id", $userId);
       $stmt->bindParam(":movie_id", $movie_id);
       $stmt->bindParam(":tmdb_id", $tmdb_id);
       $stmt->bindParam(":imdb_id", $imdb_id, PDO::PARAM_STR);
       $stmt->bindParam(":watched", $requestJson["watched"], PDO::PARAM_INT);
+      $stmt->bindParam(":want_to_watch", $requestJson["want_to_watch"], PDO::PARAM_INT);
       $stmt->bindParam(":blu_ray", $requestJson["blu_ray"], PDO::PARAM_INT);
       $stmt->bindParam(":dvd", $requestJson["dvd"], PDO::PARAM_INT);
       $stmt->bindParam(":digital", $requestJson["digital"], PDO::PARAM_INT);
