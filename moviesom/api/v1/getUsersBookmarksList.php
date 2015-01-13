@@ -55,7 +55,7 @@
       $stmt->execute();
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $response['total_results'] = intval($row["total_results"]);
-        $response['total_pages'] = intval($row["total_results"]/$resultsPerPage);
+        $response['total_pages'] = intval(ceil($row["total_results"]/$resultsPerPage));
       }
       $stmt = $dbh->prepare("SELECT * FROM movie_ratings AS mr JOIN movies AS m ON m.id=mr.movie_id JOIN users_movies AS um ON um.movie_id=m.id WHERE um.user_id=:user_id AND m.title LIKE :search_title AND (want_to_watch>0) AND um.tmdb_id=mr.source_id ORDER BY m.title LIMIT :offset, :results_per_page");
       $stmt->bindParam(":user_id", $userId);
