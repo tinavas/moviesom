@@ -36,8 +36,13 @@
                               "SUM(seen) AS unique_movies_seen, " .
                               "SUM(movie_runtime) AS unique_movies_seen_runtime, " .
                               "SUM(owned) AS owned_movies, " .
-                              "SUM(runtime*owned) AS owned_movies_runtime " .
-                              "FROM (SELECT runtime, watched AS times_watched, LEAST(watched, 1) AS seen, " .
+                              "SUM(runtime*owned) AS owned_movies_runtime, " .
+                              "SUM(want_to_watch) AS want_to_watch, " .
+                              "SUM(runtime*want_to_watch) AS want_to_watch_runtime " .
+                              "FROM (SELECT runtime, " .
+                                "want_to_watch, " .
+                                "watched AS times_watched, " .
+                                "LEAST(watched, 1) AS seen, " .
                                 "(runtime*LEAST(watched, 1)) AS movie_runtime, " .
                                 "(runtime*watched) AS time_watching_movies, " .
                                 "GREATEST(blu_ray,dvd,digital,other) AS owned " .
