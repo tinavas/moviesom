@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Machine: 127.0.0.1
--- Genereertijd: 12 jan 2015 om 22:33
+-- Genereertijd: 13 jan 2015 om 21:33
 -- Serverversie: 5.5.24-log
 -- PHP-versie: 5.6.0
 
@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS `login_tokens` (
   `user_id` bigint(20) NOT NULL,
   `token` varchar(255) NOT NULL,
   `ip` varchar(45) NOT NULL,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`ip`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
