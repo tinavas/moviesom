@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Machine: 127.0.0.1
--- Genereertijd: 13 jan 2015 om 21:33
+-- Genereertijd: 15 jan 2015 om 23:22
 -- Serverversie: 5.5.24-log
 -- PHP-versie: 5.6.0
 
@@ -133,6 +133,63 @@ CREATE TABLE IF NOT EXISTS `page_settings` (
   UNIQUE KEY `name` (`name`,`page_md5`),
   UNIQUE KEY `name_2` (`name`,`page_md5`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `tv`
+--
+
+CREATE TABLE IF NOT EXISTS `tv` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `title` varchar(256) NOT NULL,
+  `episode_run_time` varchar(256) DEFAULT NULL,
+  `number_of_episodes` int(11) DEFAULT NULL,
+  `number_of_seasons` int(11) DEFAULT NULL,
+  `first_air_date` date DEFAULT NULL,
+  `last_air_date` date DEFAULT NULL,
+  `backdrop_path` varchar(255) DEFAULT NULL,
+  `poster_path` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `title` (`title`(255))
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `tv_ratings`
+--
+
+CREATE TABLE IF NOT EXISTS `tv_ratings` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `tv_id` bigint(20) NOT NULL,
+  `source_id` varchar(32) NOT NULL,
+  `rating` float DEFAULT NULL,
+  `votes` int(11) DEFAULT NULL,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tv_id` (`tv_id`,`source_id`),
+  KEY `rating` (`rating`),
+  KEY `voters` (`votes`),
+  KEY `updated` (`updated`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `tv_sources`
+--
+
+CREATE TABLE IF NOT EXISTS `tv_sources` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `tv_id` bigint(20) NOT NULL,
+  `tmdb_id` int(11) NOT NULL,
+  `imdb_id` varchar(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tv_id` (`tv_id`),
+  UNIQUE KEY `tmdb_id` (`tmdb_id`),
+  UNIQUE KEY `imdb_id` (`imdb_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
