@@ -1,6 +1,6 @@
 <?php
   /**
-   * Set users movies settings.
+   * Set user movie settings.
    * Expects JSON as payload I.e.:
    *  {
    *    "token": "d967a19940bdc4d498d0420a9fb12802ab5857a0a634ab73ae8984c5cf46ab3f9322dd5c1c3f069cc9d226ce47112747976c289cf6ae7b41a8ac72a7dc69c83f",

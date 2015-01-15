@@ -1,17 +1,17 @@
 <?php
   /**
-   * Get movie ratings.
+   * Get tv ratings.
    * Expects JSON as payload I.e.:
    *  {
-   *    "movie_ids": [
+   *    "tv_ids": [
    *      {id: "1"},
    *      {id: "2"}
    *    ],
-   *    "movie_tmdb_ids": [
+   *    "tv_tmdb_ids": [
    *      {id: "550"},
    *      {id: "289732"}
    *    ],
-   *    "movie_imdb_ids": [
+   *    "tv_imdb_ids": [
    *      {id: "tt0137523"},
    *      {id: "tt3560742"}
    *    ]
@@ -28,34 +28,34 @@
   $requestJson = json_decode(file_get_contents("php://input"), true);
   
   // We need at least one of the following arrays in order to proceed with searching.
-  if (isset($requestJson['movie_ids']) || isset($requestJson['movie_tmdb_ids']) || isset($requestJson['movie_imdb_ids'])) {
+  if (isset($requestJson['tv_ids']) || isset($requestJson['tv_tmdb_ids']) || isset($requestJson['tv_imdb_ids'])) {
     // If any of the request variables aren't defined then we create an empty one.
-    if(isset($requestJson['movie_ids']) == false) $requestJson['movie_ids'] = [];
-    if(isset($requestJson['movie_tmdb_ids']) == false) $requestJson['movie_tmdb_ids'] = [];
-    if(isset($requestJson['movie_imdb_ids']) == false) $requestJson['movie_imdb_ids'] = [];
+    if(isset($requestJson['tv_ids']) == false) $requestJson['tv_ids'] = [];
+    if(isset($requestJson['tv_tmdb_ids']) == false) $requestJson['tv_tmdb_ids'] = [];
+    if(isset($requestJson['tv_imdb_ids']) == false) $requestJson['tv_imdb_ids'] = [];
     try {
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       if ($dbh->inTransaction() === false) {
         $dbh->beginTransaction();
       }
-      $idsWhereIn = (count($requestJson['movie_ids'])) ? implode(',', array_fill(0, count($requestJson['movie_ids']), '?')) : "";
+      $idsWhereIn = (count($requestJson['tv_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_ids']), '?')) : "";
       if(strlen($idsWhereIn) == 0) $idsWhereIn = "NULL";
-      $tmdbWhereIn = (count($requestJson['movie_tmdb_ids'])) ? implode(',', array_fill(0, count($requestJson['movie_tmdb_ids']), '?')): "";
+      $tmdbWhereIn = (count($requestJson['tv_tmdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_tmdb_ids']), '?')): "";
       if(strlen($tmdbWhereIn) == 0) $tmdbWhereIn = "NULL";
-      $imdbWhereIn = (count($requestJson['movie_imdb_ids'])) ? implode(',', array_fill(0, count($requestJson['movie_imdb_ids']), '?')) : "";
+      $imdbWhereIn = (count($requestJson['tv_imdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_imdb_ids']), '?')) : "";
       if(strlen($imdbWhereIn) == 0) $imdbWhereIn = "NULL";
-      $stmt = $dbh->prepare("SELECT * FROM movie_ratings AS mr JOIN movie_sources AS ms ON ms.movie_id=mr.movie_id WHERE mr.movie_id IN(SELECT m.id FROM movies AS m JOIN movie_sources AS ms ON ms.movie_id=m.id WHERE m.id IN({$idsWhereIn}) OR ms.tmdb_id IN({$tmdbWhereIn}) OR ms.imdb_id IN({$imdbWhereIn}))");
+      $stmt = $dbh->prepare("SELECT * FROM tv_ratings AS mr JOIN tv_sources AS ms ON ms.tv_id=mr.tv_id WHERE mr.tv_id IN(SELECT m.id FROM tv AS m JOIN tv_sources AS ms ON ms.tv_id=m.id WHERE m.id IN({$idsWhereIn}) OR ms.tmdb_id IN({$tmdbWhereIn}) OR ms.imdb_id IN({$imdbWhereIn}))");
       $pos = 0;
-      foreach ($requestJson['movie_ids'] as $k => $id) {
+      foreach ($requestJson['tv_ids'] as $k => $id) {
         $pos++;
         $stmt->bindValue($pos, $id["id"]);
       }
-      foreach ($requestJson['movie_tmdb_ids'] as $k => $id) {
+      foreach ($requestJson['tv_tmdb_ids'] as $k => $id) {
         $pos++;
         $stmt->bindValue($pos, $id["id"]);
       }
-      foreach ($requestJson['movie_imdb_ids'] as $k => $id) {
+      foreach ($requestJson['tv_imdb_ids'] as $k => $id) {
         $pos++;
         $stmt->bindValue($pos, $id["id"]);
       }
