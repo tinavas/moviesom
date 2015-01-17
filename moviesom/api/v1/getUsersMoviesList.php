@@ -75,6 +75,7 @@
         $row["media_type"] = "movie";
         $row["vote_average"] = $row["rating"];
         $row["vote_count"] = $row["votes"];
+        $row["owned"] = $row["blu_ray"]|$row["dvd"]|$row["digital"]|$row["other"];
         $usersMovies[] = $row;
       }
       $response["results"] = $usersMovies;

@@ -4,7 +4,7 @@
    * Expects JSON as payload I.e.:
    *  {
    *    "title": "Fight Club"
-   *    "episode_run_time": "22, 25",
+   *    "episode_run_time": "[22, 25]",
    *    "tmdb_id": 7468,
    *    "first_air_date": "1999-10-14",
    *    "last_air_date": "2014-03-31",
@@ -54,14 +54,14 @@
         break;
       }
 
-      $episodeRunTime = implode(",", $requestJson["episode_run_time"]);
+      $avgEpisodeRunTime = round(array_sum($requestJson["episode_run_time"]) / count($requestJson["episode_run_time"]));
       
       // We create the movie to obtain a movie id if it doesn't exist already.
       if(isset($tv_id) === false) {
         // Insert record into tv
         $stmt = $dbh->prepare("INSERT INTO tv (title, episode_run_time, number_of_episodes, number_of_seasons, first_air_date, last_air_date, backdrop_path, poster_path) VALUES (:title, :episode_run_time, :number_of_episodes, :number_of_seasons, :first_air_date, :last_air_date, :backdrop_path, :poster_path)");
         $stmt->bindParam(":title", $requestJson["title"]);
-        $stmt->bindParam(":episode_run_time", $episodeRunTime);
+        $stmt->bindParam(":episode_run_time", $avgEpisodeRunTime);
         $stmt->bindParam(":number_of_episodes", $requestJson["number_of_episodes"]);
         $stmt->bindParam(":number_of_seasons", $requestJson["number_of_seasons"]);
         $stmt->bindParam(":first_air_date", $requestJson["first_air_date"]);
@@ -72,7 +72,7 @@
         $tv_id = $dbh->lastInsertId();
       } else {
         $stmt = $dbh->prepare("UPDATE tv SET episode_run_time=:episode_run_time, number_of_episodes=:number_of_episodes, number_of_seasons=:number_of_seasons, first_air_date=:first_air_date, last_air_date=:last_air_date, backdrop_path=:backdrop_path, poster_path=:poster_path WHERE id=:tv_id");
-        $stmt->bindParam(":episode_run_time", $episodeRunTime);
+        $stmt->bindParam(":episode_run_time", $avgEpisodeRunTime);
         $stmt->bindParam(":number_of_episodes", $requestJson["number_of_episodes"]);
         $stmt->bindParam(":number_of_seasons", $requestJson["number_of_seasons"]);
         $stmt->bindParam(":first_air_date", $requestJson["first_air_date"]);
