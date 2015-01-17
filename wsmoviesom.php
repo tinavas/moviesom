@@ -31,5 +31,7 @@
 
     echo json_encode($multiResponse);
   } else {
+    header('HTTP/1.1 500 Internal Server Error');
+    header('Content-type: application/json');
     echo "Unknown webservice\r\n";
   }

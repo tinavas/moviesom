@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Machine: 127.0.0.1
--- Genereertijd: 15 jan 2015 om 23:22
+-- Genereertijd: 17 jan 2015 om 21:22
 -- Serverversie: 5.5.24-log
 -- PHP-versie: 5.6.0
 
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS `page_settings` (
 CREATE TABLE IF NOT EXISTS `tv` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `title` varchar(256) NOT NULL,
-  `episode_run_time` varchar(256) DEFAULT NULL,
+  `episode_run_time` int(11) DEFAULT NULL,
   `number_of_episodes` int(11) DEFAULT NULL,
   `number_of_seasons` int(11) DEFAULT NULL,
   `first_air_date` date DEFAULT NULL,
@@ -152,6 +152,61 @@ CREATE TABLE IF NOT EXISTS `tv` (
   `poster_path` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `title` (`title`(255))
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `tv_episodes`
+--
+
+CREATE TABLE IF NOT EXISTS `tv_episodes` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `title` varchar(256) NOT NULL,
+  `air_date` date DEFAULT NULL,
+  `tmdb_tv_id` int(11) NOT NULL,
+  `season_number` int(11) DEFAULT NULL,
+  `episode_number` varchar(255) DEFAULT NULL,
+  `still_path` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `title` (`title`(255))
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `tv_episode_ratings`
+--
+
+CREATE TABLE IF NOT EXISTS `tv_episode_ratings` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `tv_episode_id` bigint(20) NOT NULL,
+  `source_id` varchar(32) NOT NULL,
+  `rating` float DEFAULT NULL,
+  `votes` int(11) DEFAULT NULL,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tv_episode_id` (`tv_episode_id`,`source_id`),
+  KEY `rating` (`rating`),
+  KEY `voters` (`votes`),
+  KEY `updated` (`updated`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `tv_episode_sources`
+--
+
+CREATE TABLE IF NOT EXISTS `tv_episode_sources` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `tv_episode_id` bigint(20) NOT NULL,
+  `tmdb_id` int(11) NOT NULL,
+  `imdb_id` varchar(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tv_episode_id` (`tv_episode_id`),
+  UNIQUE KEY `tmdb_id` (`tmdb_id`),
+  UNIQUE KEY `imdb_id` (`imdb_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -237,6 +292,35 @@ CREATE TABLE IF NOT EXISTS `users_movies` (
   KEY `other` (`other`),
   KEY `lend_out` (`lend_out`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `users_tv_episodes`
+--
+
+CREATE TABLE IF NOT EXISTS `users_tv_episodes` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `tv_episode_id` bigint(20) NOT NULL,
+  `tv_episode_tmdb_id` int(11) NOT NULL,
+  `tv_episode_imdb_id` varchar(32) NOT NULL,
+  `watched` int(11) NOT NULL,
+  `want_to_watch` tinyint(4) NOT NULL,
+  `blu_ray` tinyint(1) NOT NULL,
+  `dvd` tinyint(1) NOT NULL,
+  `digital` tinyint(1) NOT NULL,
+  `other` tinyint(1) NOT NULL,
+  `lend_out` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`,`tv_episode_id`,`tv_episode_tmdb_id`,`tv_episode_imdb_id`),
+  KEY `watched` (`watched`),
+  KEY `blu_ray` (`blu_ray`),
+  KEY `dvd` (`dvd`),
+  KEY `digital` (`digital`),
+  KEY `other` (`other`),
+  KEY `lend_out` (`lend_out`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
