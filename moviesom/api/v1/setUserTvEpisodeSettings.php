@@ -1,10 +1,10 @@
 <?php
   /**
-   * Set user movie settings.
+   * Set user tv_episode settings.
    * Expects JSON as payload I.e.:
    *  {
    *    "token": "d967a19940bdc4d498d0420a9fb12802ab5857a0a634ab73ae8984c5cf46ab3f9322dd5c1c3f069cc9d226ce47112747976c289cf6ae7b41a8ac72a7dc69c83f",
-   *    "movie_id": 550,
+   *    "tv_episode_id": 550,
    *    "tmdb_id": 7468,
    *    "imdb_id": "tt0137523",
    *    "watched": "2",
@@ -36,7 +36,7 @@
     header('HTTP/1.1 401 Unauthorized');
     $response['message'] = 'Insufficient rights';
     $response['status'] = 401;
-  } else if ((isset($requestJson['movie_id']) || isset($requestJson['tmdb_id']) || isset($requestJson['imdb_id']))) {
+  } else if ((isset($requestJson['tv_episode_id']) || isset($requestJson['tmdb_id']) || isset($requestJson['imdb_id']))) {
     try {
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -44,27 +44,27 @@
         $dbh->beginTransaction();
       }
       
-      $stmt = $dbh->prepare("SELECT m.id, ms.tmdb_id, ms.imdb_id FROM movies AS m JOIN movie_sources AS ms ON ms.movie_id=m.id WHERE m.id=:movie_id OR ms.tmdb_id=:tmdb_id OR ms.imdb_id=:imdb_id GROUP BY m.id");
-      $stmt->bindParam(":movie_id", $requestJson["movie_id"]);
+      $stmt = $dbh->prepare("SELECT te.id, tes.tmdb_id, tes.imdb_id FROM tv_episodes AS te JOIN tv_episode_sources AS tes ON tes.tv_episode_id=te.id WHERE te.id=:tv_episode_id OR tes.tmdb_id=:tmdb_id OR tes.imdb_id=:imdb_id GROUP BY te.id");
+      $stmt->bindParam(":tv_episode_id", $requestJson["tv_episode_id"]);
       $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
       $stmt->bindParam(":imdb_id", $requestJson["imdb_id"]);
       $stmt->execute();
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $movieExists = true;
-        $movie_id = $row["id"];
+        $tv_episodeExists = true;
+        $tv_episode_id = $row["id"];
         $tmdb_id = $row["tmdb_id"];
         $imdb_id = $row["imdb_id"];
         break;
       }
 
-      // Insert the users movies settings
+      // Insert the users tv_episodes settings
       $stmt = $dbh->prepare(
-        "INSERT INTO users_movies (user_id, movie_id, tmdb_id, imdb_id, watched, want_to_watch, blu_ray, dvd, digital, other, lend_out)" .
-        " VALUES (:user_id, :movie_id, :tmdb_id, :imdb_id, :watched, :want_to_watch, :blu_ray, :dvd, :digital, :other, :lend_out)" .
+        "INSERT INTO users_tv_episodes (user_id, tv_episode_id, tmdb_id, imdb_id, watched, want_to_watch, blu_ray, dvd, digital, other, lend_out)" .
+        " VALUES (:user_id, :tv_episode_id, :tmdb_id, :imdb_id, :watched, :want_to_watch, :blu_ray, :dvd, :digital, :other, :lend_out)" .
         " ON DUPLICATE KEY UPDATE watched=:watched, want_to_watch=:want_to_watch, blu_ray=:blu_ray, dvd=:dvd, digital=:digital, other=:other, lend_out=:lend_out"
       );
       $stmt->bindParam(":user_id", $userId);
-      $stmt->bindParam(":movie_id", $movie_id);
+      $stmt->bindParam(":tv_episode_id", $tv_episode_id);
       $stmt->bindParam(":tmdb_id", $tmdb_id);
       $stmt->bindParam(":imdb_id", $imdb_id, PDO::PARAM_STR);
       $stmt->bindParam(":watched", $requestJson["watched"], PDO::PARAM_INT);

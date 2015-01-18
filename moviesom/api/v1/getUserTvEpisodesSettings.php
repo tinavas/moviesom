@@ -56,7 +56,7 @@
       if(strlen($tmdbWhereIn) == 0) $tmdbWhereIn = "NULL";
       $imdbWhereIn = (count($requestJson['tv_episode_imdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_episode_imdb_ids']), '?')) : "";
       if(strlen($imdbWhereIn) == 0) $imdbWhereIn = "NULL";
-      $stmt = $dbh->prepare("SELECT * FROM users_tv_episodes WHERE user_id=? AND (tv_episode_id IN({$movieWhereIn}) OR tv_episode_tmdb_id IN({$tmdbWhereIn}) OR tv_episode_imdb_id IN({$imdbWhereIn}))");
+      $stmt = $dbh->prepare("SELECT * FROM users_tv_episodes WHERE user_id=? AND (tv_episode_id IN({$movieWhereIn}) OR tmdb_id IN({$tmdbWhereIn}) OR imdb_id IN({$imdbWhereIn}))");
       $stmt->bindValue(1, $userId);
       $pos = 1;
       foreach ($requestJson['tv_episode_ids'] as $k => $id) {
