@@ -49,11 +49,25 @@
       }
       
       // Get total count of movies
-      $stmt = $dbh->prepare("SELECT COUNT(*) AS total_results FROM users_movies AS um 
-                                JOIN movies AS m ON m.id=um.movie_id 
-                              WHERE um.user_id=:user_id 
+      $stmt = $dbh->prepare("SELECT COUNT(*) AS total_results 
+                              FROM 
+                              (SELECT m.id
+                              FROM
+                              users_movies AS um 
+                                JOIN movies AS m ON m.id=um.movie_id
+                              WHERE um.user_id=:user_id
                                 AND m.title LIKE :search_title 
-                                AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0)");
+                                AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0)
+                              UNION ALL
+                              SELECT te.id
+                              FROM
+                              users_tv_episodes AS ute 
+                                JOIN tv_episodes AS te ON ute.tv_episode_id=te.id
+                                JOIN tv_sources AS ts ON ts.tmdb_id=te.tmdb_tv_id
+                                JOIN tv ON tv.id=ts.tv_id
+                              WHERE ute.user_id=:user_id
+                                AND (tv.title LIKE :search_title OR te.title LIKE :search_title)
+                                AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0)) subquery");
       $stmt->bindParam(":user_id", $userId);
       $stmt->bindParam(":search_title", $searchString, PDO::PARAM_STR);
       $stmt->execute();
