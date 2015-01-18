@@ -44,7 +44,12 @@
         $dbh->beginTransaction();
       }
       
-      $stmt = $dbh->prepare("SELECT te.id, tes.tmdb_id, tes.imdb_id FROM tv_episodes AS te JOIN tv_episode_sources AS tes ON tes.tv_episode_id=te.id WHERE te.id=:tv_episode_id OR tes.tmdb_id=:tmdb_id OR tes.imdb_id=:imdb_id GROUP BY te.id");
+      $stmt = $dbh->prepare("SELECT te.id, tes.tmdb_id, tes.imdb_id FROM tv_episodes AS te 
+                                JOIN tv_episode_sources AS tes ON tes.tv_episode_id=te.id 
+                              WHERE te.id=:tv_episode_id 
+                                OR tes.tmdb_id=:tmdb_id 
+                                OR tes.imdb_id=:imdb_id 
+                              GROUP BY te.id");
       $stmt->bindParam(":tv_episode_id", $requestJson["tv_episode_id"]);
       $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
       $stmt->bindParam(":imdb_id", $requestJson["imdb_id"]);
@@ -58,11 +63,16 @@
       }
 
       // Insert the users tv_episodes settings
-      $stmt = $dbh->prepare(
-        "INSERT INTO users_tv_episodes (user_id, tv_episode_id, tmdb_id, imdb_id, watched, want_to_watch, blu_ray, dvd, digital, other, lend_out)" .
-        " VALUES (:user_id, :tv_episode_id, :tmdb_id, :imdb_id, :watched, :want_to_watch, :blu_ray, :dvd, :digital, :other, :lend_out)" .
-        " ON DUPLICATE KEY UPDATE watched=:watched, want_to_watch=:want_to_watch, blu_ray=:blu_ray, dvd=:dvd, digital=:digital, other=:other, lend_out=:lend_out"
-      );
+      $stmt = $dbh->prepare("INSERT INTO users_tv_episodes (user_id, tv_episode_id, tmdb_id, imdb_id, watched, want_to_watch, blu_ray, dvd, digital, other, lend_out)
+                              VALUES (:user_id, :tv_episode_id, :tmdb_id, :imdb_id, :watched, :want_to_watch, :blu_ray, :dvd, :digital, :other, :lend_out)
+                              ON DUPLICATE KEY UPDATE 
+                                watched=:watched, 
+                                want_to_watch=:want_to_watch, 
+                                blu_ray=:blu_ray, 
+                                dvd=:dvd, 
+                                digital=:digital, 
+                                other=:other, 
+                                lend_out=:lend_out");
       $stmt->bindParam(":user_id", $userId);
       $stmt->bindParam(":tv_episode_id", $tv_episode_id);
       $stmt->bindParam(":tmdb_id", $tmdb_id);

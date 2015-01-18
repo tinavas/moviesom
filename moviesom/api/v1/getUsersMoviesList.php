@@ -48,8 +48,12 @@
         $searchString = "%{$requestJson["query"]}%";
       }
       
-      // Get total count
-      $stmt = $dbh->prepare("SELECT COUNT(*) AS total_results FROM users_movies AS um JOIN movies AS m ON m.id=um.movie_id WHERE um.user_id=:user_id AND m.title LIKE :search_title AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0)");
+      // Get total count of movies
+      $stmt = $dbh->prepare("SELECT COUNT(*) AS total_results FROM users_movies AS um 
+                                JOIN movies AS m ON m.id=um.movie_id 
+                              WHERE um.user_id=:user_id 
+                                AND m.title LIKE :search_title 
+                                AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0)");
       $stmt->bindParam(":user_id", $userId);
       $stmt->bindParam(":search_title", $searchString, PDO::PARAM_STR);
       $stmt->execute();
@@ -57,7 +61,40 @@
         $response['total_results'] = intval($row["total_results"]);
         $response['total_pages'] = intval(ceil($row["total_results"]/$resultsPerPage));
       }
-      $stmt = $dbh->prepare("SELECT * FROM movie_ratings AS mr JOIN movies AS m ON m.id=mr.movie_id JOIN users_movies AS um ON um.movie_id=m.id WHERE um.user_id=:user_id AND m.title LIKE :search_title AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0) AND um.tmdb_id=mr.source_id ORDER BY m.title LIMIT :offset, :results_per_page");
+      
+      // SELECT movies.
+      $stmt = $dbh->prepare("SELECT * FROM
+                              (SELECT 
+                                 m.id, m.title, m.runtime, '' AS number_of_episodes, '' as number_of_seasons, release_date, '' AS last_air_date, 
+                                 backdrop_path, poster_path, '' AS episode_title, '' AS season_number, '' AS episode_number, '' AS air_date, 
+                                 um.tmdb_id, mr.rating, mr.votes, mr.updated, um.imdb_id,
+                                 um.watched, um.want_to_watch, um.blu_ray, um.dvd, um.digital, um.other, um.lend_out,
+                                'movie' AS media_type
+                              FROM movie_ratings AS mr 
+                                JOIN movies AS m ON m.id=mr.movie_id 
+                                JOIN users_movies AS um ON um.movie_id=m.id 
+                              WHERE um.user_id=18 AND m.title LIKE :search_title 
+                                AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0) 
+                                AND um.tmdb_id=mr.source_id
+                              UNION ALL
+                              SELECT 
+                                tv.id AS tv_id, tv.title, tv.episode_run_time AS runtime, tv.number_of_episodes, tv.number_of_seasons, 
+                                tv.first_air_date, tv.last_air_date, tv.backdrop_path, tv.poster_path, te.title AS episode_title,
+                                te.season_number, te.episode_number, te.air_date, te.tmdb_tv_id AS tmdb_id, ter.rating, ter.votes, ter.updated, ute.imdb_id,
+                                ute.watched, ute.want_to_watch, ute.blu_ray, ute.dvd, ute.digital, ute.other, ute.lend_out,
+                                'tv' AS media_type
+                              FROM users_tv_episodes AS ute
+                                JOIN tv_episode_sources AS tes ON tes.tmdb_id=ute.tmdb_id
+                                JOIN tv_episodes AS te ON te.id=tes.tv_episode_id
+                                JOIN tv_episode_ratings AS ter ON ter.tv_episode_id=te.id
+                                JOIN tv_sources AS ts ON ts.tmdb_id=te.tmdb_tv_id
+                                JOIN tv ON tv.id=ts.tv_id
+                              WHERE ute.user_id=18 
+                                AND (tv.title LIKE :search_title OR te.title LIKE :search_title )
+                                AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0) 
+                                AND ter.source_id=tes.tmdb_id
+                              GROUP BY tv.id) subquery
+                            ORDER BY title LIMIT :offset, :results_per_page");
       $stmt->bindParam(":user_id", $userId);
       $stmt->bindParam(":search_title", $searchString, PDO::PARAM_STR);
       $offset = (($page-1)*$resultsPerPage);
@@ -72,14 +109,15 @@
         $row["popularity"] = null;
         $row["video"] = false;
         $row["id"] = $row["tmdb_id"];
-        $row["media_type"] = "movie";
         $row["vote_average"] = $row["rating"];
         $row["vote_count"] = $row["votes"];
         $row["owned"] = $row["blu_ray"]|$row["dvd"]|$row["digital"]|$row["other"];
         $usersMovies[] = $row;
       }
-      $response["results"] = $usersMovies;
       
+      // Set the response results.
+      $response["results"] = $usersMovies;
+
       if($dbh->commit()) {
         header('HTTP/1.1 200 OK');
         $response['status'] = 200;
