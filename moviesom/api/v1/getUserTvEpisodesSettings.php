@@ -15,6 +15,10 @@
    *    "tv_episode_imdb_ids": [
    *      {id: "tt0137523"},
    *      {id: "tt3560742"}
+   *    ],
+   *    "tv_tmdb_ids": [
+   *      {id: "1100"},
+   *      {id: "1425"}
    *    ]
    *  }
    */
@@ -39,24 +43,39 @@
     header('HTTP/1.1 401 Unauthorized');
     $response['message'] = 'Insufficient rights';
     $response['status'] = 401;
-  } else if (isset($requestJson['tv_episode_ids']) || isset($requestJson['tv_episode_tmdb_ids']) || isset($requestJson['tv_episode_imdb_ids'])) {
+  } else if (isset($requestJson['tv_episode_ids']) || 
+              isset($requestJson['tv_episode_tmdb_ids']) || 
+              isset($requestJson['tv_episode_imdb_ids']) || 
+              isset($requestJson['tv_tmdb_ids'])) {
     // If any of the request variables aren't defined then we create an empty one.
     if(isset($requestJson['tv_episode_ids']) == false) $requestJson['tv_episode_ids'] = [];
     if(isset($requestJson['tv_episode_tmdb_ids']) == false) $requestJson['tv_episode_tmdb_ids'] = [];
     if(isset($requestJson['tv_episode_imdb_ids']) == false) $requestJson['tv_episode_imdb_ids'] = [];
+    if(isset($requestJson['tv_tmdb_ids']) == false) $requestJson['tv_tmdb_ids'] = [];
     try {
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       if ($dbh->inTransaction() === false) {
         $dbh->beginTransaction();
       }
-      $movieWhereIn = (count($requestJson['tv_episode_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_episode_ids']), '?')) : "";
-      if(strlen($movieWhereIn) == 0) $movieWhereIn = "NULL";
-      $tmdbWhereIn = (count($requestJson['tv_episode_tmdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_episode_tmdb_ids']), '?')): "";
-      if(strlen($tmdbWhereIn) == 0) $tmdbWhereIn = "NULL";
-      $imdbWhereIn = (count($requestJson['tv_episode_imdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_episode_imdb_ids']), '?')) : "";
-      if(strlen($imdbWhereIn) == 0) $imdbWhereIn = "NULL";
-      $stmt = $dbh->prepare("SELECT * FROM users_tv_episodes WHERE user_id=? AND (tv_episode_id IN({$movieWhereIn}) OR tmdb_id IN({$tmdbWhereIn}) OR imdb_id IN({$imdbWhereIn}))");
+      $tvEpisodeWhereIn = (count($requestJson['tv_episode_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_episode_ids']), '?')) : "";
+      if(strlen($tvEpisodeWhereIn) == 0) $tvEpisodeWhereIn = "NULL";
+      $tvEpisodetvTmdbWhereIn = (count($requestJson['tv_episode_tmdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_episode_tmdb_ids']), '?')): "";
+      if(strlen($tvEpisodetvTmdbWhereIn) == 0) $tvEpisodetvTmdbWhereIn = "NULL";
+      $tvEpisodeImdbWhereIn = (count($requestJson['tv_episode_imdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_episode_imdb_ids']), '?')) : "";
+      if(strlen($tvEpisodeImdbWhereIn) == 0) $tvEpisodeImdbWhereIn = "NULL";
+      $tvTmdbWhereIn = (count($requestJson['tv_tmdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_tmdb_ids']), '?')): "";
+      if(strlen($tvTmdbWhereIn) == 0) $tvTmdbWhereIn = "NULL";
+      $stmt = $dbh->prepare("SELECT *, ute.tmdb_id AS episode_tmdb_id, ute.imdb_id AS episode_imdb_id FROM users_tv_episodes AS ute
+                                JOIN tv_episodes AS te ON te.id=ute.tv_episode_id
+                                JOIN tv_sources AS ts ON ts.tmdb_id=te.tmdb_tv_id
+                                JOIN tv ON tv.id=ts.tv_id
+                              WHERE 
+                                ute.user_id=? 
+                                AND (ute.tv_episode_id IN({$tvEpisodeWhereIn}) 
+                                  OR ute.tmdb_id IN({$tvEpisodetvTmdbWhereIn}) 
+                                  OR ute.imdb_id IN({$tvEpisodeImdbWhereIn}) 
+                                  OR te.tmdb_tv_id IN({$tvTmdbWhereIn}))");
       $stmt->bindValue(1, $userId);
       $pos = 1;
       foreach ($requestJson['tv_episode_ids'] as $k => $id) {
@@ -68,6 +87,10 @@
         $stmt->bindValue($pos, $id["id"]);
       }
       foreach ($requestJson['tv_episode_imdb_ids'] as $k => $id) {
+        $pos++;
+        $stmt->bindValue($pos, $id["id"]);
+      }
+      foreach ($requestJson['tv_tmdb_ids'] as $k => $id) {
         $pos++;
         $stmt->bindValue($pos, $id["id"]);
       }

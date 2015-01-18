@@ -48,7 +48,7 @@
         $searchString = "%{$requestJson["query"]}%";
       }
       
-      // Get total count of movies
+      // Get total count of movies and tv series
       $stmt = $dbh->prepare("SELECT COUNT(*) AS total_results 
                               FROM 
                               (SELECT m.id
@@ -76,18 +76,18 @@
         $response['total_pages'] = intval(ceil($row["total_results"]/$resultsPerPage));
       }
       
-      // SELECT movies.
+      // SELECT movies and tv series
       $stmt = $dbh->prepare("SELECT * FROM
                               (SELECT 
-                                 m.id, m.title, m.runtime, '' AS number_of_episodes, '' as number_of_seasons, release_date, '' AS last_air_date, 
-                                 backdrop_path, poster_path, '' AS episode_title, '' AS season_number, '' AS episode_number, '' AS air_date, 
-                                 um.tmdb_id, mr.rating, mr.votes, mr.updated, um.imdb_id,
-                                 um.watched, um.want_to_watch, um.blu_ray, um.dvd, um.digital, um.other, um.lend_out,
+                                m.id, m.title, m.runtime, '' AS number_of_episodes, '' as number_of_seasons, release_date, '' AS last_air_date, 
+                                backdrop_path, poster_path, '' AS episode_title, '' AS season_number, '' AS episode_number, '' AS air_date, 
+                                um.tmdb_id, mr.rating, mr.votes, mr.updated, um.imdb_id,
+                                um.watched, um.want_to_watch, um.blu_ray, um.dvd, um.digital, um.other, um.lend_out,
                                 'movie' AS media_type
                               FROM movie_ratings AS mr 
                                 JOIN movies AS m ON m.id=mr.movie_id 
                                 JOIN users_movies AS um ON um.movie_id=m.id 
-                              WHERE um.user_id=18 AND m.title LIKE :search_title 
+                              WHERE um.user_id=:user_id AND m.title LIKE :search_title 
                                 AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0) 
                                 AND um.tmdb_id=mr.source_id
                               UNION ALL
@@ -103,7 +103,7 @@
                                 JOIN tv_episode_ratings AS ter ON ter.tv_episode_id=te.id
                                 JOIN tv_sources AS ts ON ts.tmdb_id=te.tmdb_tv_id
                                 JOIN tv ON tv.id=ts.tv_id
-                              WHERE ute.user_id=18 
+                              WHERE ute.user_id=:user_id 
                                 AND (tv.title LIKE :search_title OR te.title LIKE :search_title )
                                 AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0) 
                                 AND ter.source_id=tes.tmdb_id

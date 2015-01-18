@@ -38,11 +38,16 @@
         $dbh->beginTransaction();
       }
       
-      $stmt = $dbh->prepare("SELECT * FROM tv_episode_ratings WHERE tv_episode_id=(SELECT m.id FROM tv AS m JOIN tv_episode_sources AS ms ON ms.tv_episode_id=m.id WHERE m.id=:id OR ms.tmdb_id=:tmdb_id OR ms.imdb_id=:imdb_id GROUP BY m.id LIMIT 1)");
-      $stmt->bindParam(":id", $requestJson["id"]);
+      $stmt = $dbh->prepare("SELECT * FROM tv_episode_sources AS tes
+                                JOIN tv_episodes AS te ON te.id=tes.tv_episode_id
+                                JOIN tv_sources AS ts ON ts.tmdb_id=te.tmdb_tv_id
+                                JOIN tv ON tv.id=ts.tv_id
+                              WHERE tes.tmdb_id=:tmdb_id
+                                AND tes.imdb_id=:imdb_id");
       $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
       $stmt->bindParam(":imdb_id", $requestJson["imdb_id"]);
       $stmt->execute();
+      var_dump($requestJson);
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $movieExists = true;
         $tv_episode_id = $row["tv_episode_id"];
