@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Machine: 127.0.0.1
--- Genereertijd: 18 jan 2015 om 19:47
+-- Genereertijd: 19 jan 2015 om 23:38
 -- Serverversie: 5.5.24-log
 -- PHP-versie: 5.6.0
 
@@ -285,6 +285,35 @@ CREATE TABLE IF NOT EXISTS `users_movies` (
   `lend_out` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`movie_id`,`tmdb_id`,`imdb_id`),
+  KEY `watched` (`watched`),
+  KEY `blu_ray` (`blu_ray`),
+  KEY `dvd` (`dvd`),
+  KEY `digital` (`digital`),
+  KEY `other` (`other`),
+  KEY `lend_out` (`lend_out`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `users_tv`
+--
+
+CREATE TABLE IF NOT EXISTS `users_tv` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `tv_id` bigint(20) NOT NULL,
+  `tmdb_id` int(11) NOT NULL,
+  `imdb_id` varchar(32) NOT NULL,
+  `watched` int(11) NOT NULL,
+  `want_to_watch` tinyint(4) NOT NULL,
+  `blu_ray` tinyint(1) NOT NULL,
+  `dvd` tinyint(1) NOT NULL,
+  `digital` tinyint(1) NOT NULL,
+  `other` tinyint(1) NOT NULL,
+  `lend_out` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`,`tv_id`,`tmdb_id`,`imdb_id`),
   KEY `watched` (`watched`),
   KEY `blu_ray` (`blu_ray`),
   KEY `dvd` (`dvd`),

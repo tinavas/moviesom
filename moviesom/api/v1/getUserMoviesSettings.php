@@ -34,7 +34,6 @@
   $loggedIn = $credentials->hasMoviesomAccess();
   $userId = $credentials->getUserId();
 
-  // We need at least one of the following arrays in order to proceed with searching.
   if($loggedIn === false) {
     header('HTTP/1.1 401 Unauthorized');
     $response['message'] = 'Insufficient rights';

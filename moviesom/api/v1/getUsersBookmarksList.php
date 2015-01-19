@@ -91,6 +91,20 @@
                                 AND um.tmdb_id=mr.source_id
                               UNION ALL
                               SELECT 
+                                m.id, m.title, m.episode_run_time AS runtime, '' AS number_of_episodes, '' as number_of_seasons, m.first_air_date, m.last_air_date, 
+                                backdrop_path, poster_path, '' AS episode_title, '' AS season_number, '' AS episode_number, '' AS air_date, 
+                                um.tmdb_id, mr.rating, mr.votes, mr.updated, um.imdb_id,
+                                um.watched, um.want_to_watch, um.blu_ray, um.dvd, um.digital, um.other, um.lend_out,
+                                '' AS episode_tmdb_id, '' AS episode_imdb_id,
+                                'tv' AS media_type
+                              FROM tv_ratings AS mr
+                                JOIN tv AS m ON m.id=mr.tv_id
+                                JOIN users_tv AS um ON um.tv_id=m.id
+                              WHERE um.user_id=:user_id AND m.title LIKE :search_title
+                                AND want_to_watch>0
+                                AND um.tmdb_id=mr.source_id
+                              UNION ALL
+                              SELECT 
                                 tv.id AS tv_id, tv.title, tv.episode_run_time AS runtime, tv.number_of_episodes, tv.number_of_seasons, 
                                 tv.first_air_date, tv.last_air_date, tv.backdrop_path, tv.poster_path, te.title AS episode_title,
                                 te.season_number, te.episode_number, te.air_date, te.tmdb_tv_id AS tmdb_id, ter.rating, ter.votes, ter.updated, ute.imdb_id,
