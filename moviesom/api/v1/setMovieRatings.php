@@ -72,11 +72,10 @@
       
       // Insert the ratings
       $stmt = $dbh->prepare(
-        "INSERT INTO movie_ratings (movie_id, source_id, rating, votes)" .
-        " VALUES (:movie_id, :tmdb_id, :tmdb_rating, :tmdb_votes)," .
-        " (:movie_id, :imdb_id, :imdb_rating, :imdb_votes)" .
-        " ON DUPLICATE KEY UPDATE rating=VALUES(rating), votes=VALUES(votes)"
-      );
+        "INSERT INTO movie_ratings (movie_id, source_id, rating, votes)
+        VALUES (:movie_id, :tmdb_id, :tmdb_rating, :tmdb_votes),
+          (:movie_id, :imdb_id, :imdb_rating, :imdb_votes)
+        ON DUPLICATE KEY UPDATE rating=VALUES(rating), votes=VALUES(votes), updated=now()");
       $stmt->bindParam(":movie_id", $movie_id);
       $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
       $stmt->bindParam(":imdb_id", $requestJson["imdb_id"]);

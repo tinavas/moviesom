@@ -84,27 +84,25 @@
       }
       
       // Insert the ratings
-      $stmt = $dbh->prepare(
-        "INSERT INTO tv_ratings (tv_id, source_id, rating, votes)" .
-        " VALUES (:tv_id, :tmdb_id, :tmdb_rating, :tmdb_votes)," .
-        " (:tv_id, :imdb_id, :imdb_rating, :imdb_votes)" .
-        " ON DUPLICATE KEY UPDATE rating=VALUES(rating), votes=VALUES(votes)"
-      );
+      $stmt = $dbh->prepare("INSERT INTO tv_ratings (tv_id, source_id, rating, votes)
+                              VALUES (:tv_id, :tmdb_id, :tmdb_rating, :tmdb_votes),
+                                (:tv_id, :imdb_id, :imdb_rating, :imdb_votes)
+                              ON DUPLICATE KEY UPDATE rating=VALUES(rating), votes=VALUES(votes), updated=now()");
       $stmt->bindParam(":tv_id", $tv_id);
       $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
       $stmt->bindParam(":imdb_id", $requestJson["imdb_id"]);
       $stmt->bindParam(":tmdb_rating", $requestJson["tmdb_rating"], PDO::PARAM_STR);
+      $stmt->bindParam(":tmdb_votes", $requestJson["tmdb_votes"], PDO::PARAM_INT);
       $requestJson["imdb_rating"] = ($requestJson["imdb_rating"]) ? $requestJson["imdb_rating"] : 0;
       $stmt->bindParam(":imdb_rating", $requestJson["imdb_rating"], PDO::PARAM_STR);
-      $stmt->bindParam(":tmdb_votes", $requestJson["tmdb_votes"], PDO::PARAM_INT);
       $requestJson["imdb_votes"] = ($requestJson["imdb_votes"]) ? $requestJson["imdb_rating"] : 0;
       $stmt->bindParam(":imdb_votes", $requestJson["imdb_votes"], PDO::PARAM_INT);
       $stmt->execute();
 
       // Insert the movie sources
       $stmt = $dbh->prepare(
-        "INSERT INTO tv_sources (tv_id, tmdb_id, imdb_id) VALUES (:tv_id, :tmdb_id, :imdb_id)" .
-        " ON DUPLICATE KEY UPDATE tv_id=VALUES(tv_id), tmdb_id=VALUES(tmdb_id), imdb_id=VALUES(imdb_id)"
+        "INSERT INTO tv_sources (tv_id, tmdb_id, imdb_id) VALUES (:tv_id, :tmdb_id, :imdb_id)
+        ON DUPLICATE KEY UPDATE tv_id=VALUES(tv_id), tmdb_id=VALUES(tmdb_id), imdb_id=VALUES(imdb_id)"
       );
       $stmt->bindParam(":tv_id", $tv_id);
       $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
