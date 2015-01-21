@@ -44,15 +44,14 @@
       }
       $tmdbWhereIn = (count($requestJson['tv_tmdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_tmdb_ids']), '?')): "";
       if(strlen($tmdbWhereIn) == 0) $tmdbWhereIn = "NULL";
-      $stmt = $dbh->prepare("SELECT ts.tmdb_id, number_of_episodes, 
-                                (SELECT COUNT(*) FROM users_tv_episodes AS ute
-                                  JOIN tv_episodes AS te ON te.id=ute.tv_episode_id
-                                WHERE te.season_number>0 
-                                  AND te.tmdb_tv_id IN({$tmdbWhereIn})
-                                  AND ute.user_id=?) AS watched
-                              FROM tv
-                                JOIN tv_sources AS ts ON ts.tv_id=tv.id
-                              WHERE tmdb_id IN({$tmdbWhereIn})");
+      $stmt = $dbh->prepare("SELECT te.tmdb_tv_id AS tmdb_id, tv.number_of_episodes, COUNT(*) AS watched FROM tv_episodes AS te 
+                                JOIN users_tv_episodes AS ute ON ute.tv_episode_id=te.id
+                                JOIN tv_sources AS ts ON ts.tmdb_id=te.tmdb_tv_id
+                                JOIN tv ON tv.id=ts.tv_id
+                              WHERE te.tmdb_tv_id IN ({$tmdbWhereIn})
+                                AND ute.user_id=?
+                                AND te.season_number>0
+                              GROUP BY te.tmdb_tv_id");
       $pos = 0;
       foreach ($requestJson['tv_tmdb_ids'] as $k => $id) {
         $pos++;
@@ -60,11 +59,7 @@
       }
       $pos++;
       $stmt->bindValue($pos, $userId);
-      foreach ($requestJson['tv_tmdb_ids'] as $k => $id) {
-        $pos++;
-        $stmt->bindValue($pos, $id["id"]);
-      }
-      
+
       $stmt->execute();
       $ratings = [];
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
