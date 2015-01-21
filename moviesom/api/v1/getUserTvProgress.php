@@ -47,7 +47,8 @@
       $stmt = $dbh->prepare("SELECT ts.tmdb_id, number_of_episodes, 
                                 (SELECT COUNT(*) FROM users_tv_episodes AS ute
                                   JOIN tv_episodes AS te ON te.id=ute.tv_episode_id
-                                WHERE te.tmdb_tv_id IN({$tmdbWhereIn})
+                                WHERE te.season_number>0 
+                                  AND te.tmdb_tv_id IN({$tmdbWhereIn})
                                   AND ute.user_id=?) AS watched
                               FROM tv
                                 JOIN tv_sources AS ts ON ts.tv_id=tv.id
