@@ -24,11 +24,10 @@
   $response['status'] = 500;
   
   $requestJson = json_decode(file_get_contents("php://input"), true);
-
+  
   if (isset($requestJson['title']) && isset($requestJson['tmdb_id']) && 
-      isset($requestJson['tmdb_tv_id']) && isset($requestJson['air_date']) && 
-      isset($requestJson['season_number']) && isset($requestJson['episode_number']) && 
-      isset($requestJson['still_path']) && isset($requestJson['tmdb_rating']) &&
+      isset($requestJson['tmdb_tv_id']) && isset($requestJson['season_number']) && 
+      isset($requestJson['episode_number']) && isset($requestJson['tmdb_rating']) &&
       isset($requestJson['tmdb_votes']) && isset($requestJson['imdb_id']) &&
       isset($requestJson['imdb_rating']) && isset($requestJson['imdb_votes'])) {
     try {
@@ -80,10 +79,10 @@
       
       // Insert the ratings
       $stmt = $dbh->prepare(
-        "INSERT INTO tv_episode_ratings (tv_episode_id, source_id, rating, votes)" .
-        " VALUES (:tv_episode_id, :tmdb_id, :tmdb_rating, :tmdb_votes)," .
-        " (:tv_episode_id, :imdb_id, :imdb_rating, :imdb_votes)" .
-        " ON DUPLICATE KEY UPDATE rating=VALUES(rating), votes=VALUES(votes)"
+        "INSERT INTO tv_episode_ratings (tv_episode_id, source_id, rating, votes)
+        VALUES (:tv_episode_id, :tmdb_id, :tmdb_rating, :tmdb_votes),
+          (:tv_episode_id, :imdb_id, :imdb_rating, :imdb_votes)
+        ON DUPLICATE KEY UPDATE rating=VALUES(rating), votes=VALUES(votes)"
       );
       $stmt->bindParam(":tv_episode_id", $tv_episode_id);
       $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
