@@ -16,7 +16,8 @@
 
   $requestJson = json_decode(file_get_contents("php://input"), true);
   
-  if(isset($requestJson['username'])) {
+  // Make sure username is set and is a valid e-mail address.
+  if(isset($requestJson['username']) && filter_var($requestJson['username'], FILTER_VALIDATE_EMAIL)) {
     try {
       $token = hash("sha512", rand() . uniqid("moviesomUID_", true));
       
@@ -72,7 +73,7 @@
         <div class="content">
         <table bgcolor="#999999">
           <tr>
-            <td>MovieSom</td>
+            <td><h1>MovieSom</h1></td>
             <td align="right"><h6 class="collapse">Password Reset</h6></td>
           </tr>
         </table>
@@ -102,8 +103,8 @@
             <p>Note: this link is only valid for 24 hours.</p>
             <!-- Callout Panel -->
             <p class="callout">
-              MovieSom: Your movie sommelier. Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">here</a>!
-            </p><!-- /Callout Panel -->					
+              MovieSom: Your movie sommelier. Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">MovieSom.com</a>!
+            </p><!-- /Callout Panel -->
                         
             <!-- social & contact -->
             <table class="social" width="100%">
@@ -124,9 +125,9 @@
                   <!-- column 2 -->
                   <table align="left" class="column">
                     <tr>
-                      <td>				
+                      <td>
                                       
-                        <h5 class="">Contact Info:</h5>												
+                        <h5 class="">Contact Info:</h5>
                         Email: <strong><a href="emailto:webmaster@moviesom.com">webmaster@moviesom.com</a></strong></p>
                 
                       </td>
