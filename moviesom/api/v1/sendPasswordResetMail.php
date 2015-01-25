@@ -99,7 +99,7 @@
             <p class="lead">You received this e-mail because a password reset request has been made on MovieSom.</p>
             <p>If you have not made this request then please be aware that someone else might be trying to get entry to your account. Do not hesitate to contact us if you believe this is the case!</p>
             <p>Use the following link to reset your password:</p>
-            <p><a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/resetPassword.html?resetToken={$token}">Reset password</a></p>
+            <p><a href="{$protocol}://app.moviesom.com/passwordReset.html?resetToken={$token}">Reset password</a></p>
             <p>Note: this link is only valid for 24 hours.</p>
             <!-- Callout Panel -->
             <p class="callout">
