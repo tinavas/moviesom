@@ -4,8 +4,8 @@
    * Expects JSON as payload I.e.:
    *  {
    *    "token": "bladiebla",
-   *    "new-password": "bladiebla",
-   *    "new-password2": "bladiebla"
+   *    "password": "bladiebla",
+   *    "password2": "bladiebla"
    *  }
    */
 
@@ -18,9 +18,9 @@
   
   // All fields should be set and new-password and new-password2 should be the same.
   if (isset($requestJson['token']) &&
-      isset($requestJson['new-password']) && strlen($requestJson['new-password']) >= 8 && isset($requestJson['new-password2']) &&
-      strcmp($requestJson['new-password'], $requestJson['new-password2']) == 0 ) {
-    $bCryptPw = password_hash($requestJson['new-password'], PASSWORD_BCRYPT, array("cost" => 10));
+      isset($requestJson['password']) && strlen($requestJson['password']) >= 8 && isset($requestJson['password2']) &&
+      strcmp($requestJson['password'], $requestJson['password2']) == 0 ) {
+    $bCryptPw = password_hash($requestJson['password'], PASSWORD_BCRYPT, array("cost" => 10));
     try {
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -31,6 +31,10 @@
       $stmt = $dbh->prepare("UPDATE users SET password=:password WHERE username=(SELECT email FROM reset_password_tokens WHERE token=:token)");
       $stmt->bindParam(":token", $requestJson["token"]);
       $stmt->bindParam(":password", $bCryptPw);
+      $stmt->execute();
+
+      $stmt = $dbh->prepare("DELETE FROM reset_password_tokens WHERE token=:token");
+      $stmt->bindParam(":token", $requestJson["token"]);
       $stmt->execute();
       
       if($dbh->commit()) {
