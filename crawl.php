@@ -56,7 +56,7 @@
     // Update every week TV Episode older than 1 month but not older than 3 months
     // Update every 2 weeks TV Episode older than 3 months but not older than 6 months
     // Update every month TV Episode older than 6 months
-    $stmt = $dbh->prepare("SELECT tes.tmdb_id FROM tv_episode_sources AS tes
+    $stmt = $dbh->prepare("SELECT te.tmdb_tv_id, season_number, episode_number FROM tv_episode_sources AS tes
                             JOIN tv_episode_ratings AS ter ON ter.source_id=tes.tmdb_id 
                             JOIN tv_episodes AS te ON te.id=tes.tv_episode_id 
                           WHERE 
@@ -72,8 +72,8 @@
                                 AND ter.updated < NOW() - INTERVAL 1 MONTH)");
     $stmt->execute();
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-      echo "cd ../phantomjs-1.9.8-windows & moviesom.bat tmdbTvEpisodeId " . $row["tmdb_id"] . PHP_EOL;
-      echo exec("cd ../phantomjs-1.9.8-windows & moviesom.bat tmdbTvEpisodeId " . $row["tmdb_id"]) . PHP_EOL;
+      echo "cd ../phantomjs-1.9.8-windows & moviesom.bat tmdbTvId " . $row["tmdb_id"] . " " . $row["season_number"] . " " . $row["episode_number"] . PHP_EOL;
+      echo exec("cd ../phantomjs-1.9.8-windows & moviesom.bat tmdbTvId " . $row["tmdb_id"] . " " . $row["season_number"] . " " . $row["episode_number"]) . PHP_EOL;
     }
     
   }
