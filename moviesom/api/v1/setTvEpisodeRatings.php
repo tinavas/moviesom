@@ -82,7 +82,7 @@
         "INSERT INTO tv_episode_ratings (tv_episode_id, source_id, rating, votes)
         VALUES (:tv_episode_id, :tmdb_id, :tmdb_rating, :tmdb_votes),
           (:tv_episode_id, :imdb_id, :imdb_rating, :imdb_votes)
-        ON DUPLICATE KEY UPDATE rating=VALUES(rating), votes=VALUES(votes)"
+        ON DUPLICATE KEY UPDATE rating=VALUES(rating), votes=VALUES(votes), updated=now()"
       );
       $stmt->bindParam(":tv_episode_id", $tv_episode_id);
       $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
