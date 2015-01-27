@@ -46,7 +46,6 @@
       $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
       $stmt->bindParam(":imdb_id", $requestJson["imdb_id"]);
       $stmt->execute();
-      var_dump($requestJson);
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $movieExists = true;
         $tv_episode_id = $row["tv_episode_id"];
