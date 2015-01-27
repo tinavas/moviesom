@@ -72,8 +72,8 @@
                                 AND ter.updated < NOW() - INTERVAL 1 MONTH)");
     $stmt->execute();
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-      echo "cd ../phantomjs-1.9.8-windows & moviesom.bat tmdbTvId " . $row["tmdb_id"] . " " . $row["season_number"] . " " . $row["episode_number"] . PHP_EOL;
-      echo exec("cd ../phantomjs-1.9.8-windows & moviesom.bat tmdbTvId " . $row["tmdb_id"] . " " . $row["season_number"] . " " . $row["episode_number"]) . PHP_EOL;
+      echo "cd ../phantomjs-1.9.8-windows & moviesom.bat tmdbTvId " . $row["tmdb_tv_id"] . " " . $row["season_number"] . " " . $row["episode_number"] . PHP_EOL;
+      echo exec("cd ../phantomjs-1.9.8-windows & moviesom.bat tmdbTvId " . $row["tmdb_tv_id"] . " " . $row["season_number"] . " " . $row["episode_number"]) . PHP_EOL;
     }
     
   }
