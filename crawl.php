@@ -49,7 +49,7 @@
     $stmt->execute();
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
       echo "cd ../phantomjs-1.9.8-windows & moviesom.bat tmdbTvId " . $row["tmdb_id"] . PHP_EOL;
-      echo exec("../phantomjs-1.9.8-windows & moviesom.bat tmdbTvId " . $row["tmdb_id"]) . PHP_EOL;
+      echo exec("cd ../phantomjs-1.9.8-windows & moviesom.bat tmdbTvId " . $row["tmdb_id"]) . PHP_EOL;
     }
     
     // Update every day TV Episode not older than 1 month
