@@ -31,28 +31,55 @@
     try {
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-      $stmt = $dbh->prepare("SELECT SUM(times_watched) AS movies_seen, " .
-                              "SUM(time_watching_movies) AS movies_seen_runtime, " .
-                              "SUM(seen) AS unique_movies_seen, " .
-                              "SUM(movie_runtime) AS unique_movies_seen_runtime, " .
-                              "SUM(owned) AS owned_movies, " .
-                              "SUM(runtime*owned) AS owned_movies_runtime, " .
-                              "SUM(want_to_watch) AS want_to_watch, " .
-                              "SUM(runtime*want_to_watch) AS want_to_watch_runtime " .
-                              "FROM (SELECT runtime, " .
-                                "want_to_watch, " .
-                                "watched AS times_watched, " .
-                                "LEAST(watched, 1) AS seen, " .
-                                "(runtime*LEAST(watched, 1)) AS movie_runtime, " .
-                                "(runtime*watched) AS time_watching_movies, " .
-                                "GREATEST(blu_ray,dvd,digital,other) AS owned " .
-                                "FROM movies AS m JOIN users_movies AS um ON um.movie_id=m.id WHERE um.user_id=:user_id) AS umm");
+      $stmt = $dbh->prepare("SELECT SUM(times_watched) AS movies_seen,
+                                SUM(time_watching_movies) AS movies_seen_runtime,
+                                SUM(seen) AS unique_movies_seen,
+                                SUM(movie_runtime) AS unique_movies_seen_runtime,
+                                SUM(owned) AS owned_movies,
+                                SUM(runtime*owned) AS owned_movies_runtime,
+                                SUM(want_to_watch) AS want_to_watch,
+                                SUM(runtime*want_to_watch) AS want_to_watch_runtime
+                              FROM (SELECT runtime,
+                                want_to_watch,
+                                watched AS times_watched,
+                                LEAST(watched, 1) AS seen,
+                                (runtime*LEAST(watched, 1)) AS movie_runtime,
+                                (runtime*watched) AS time_watching_movies,
+                                GREATEST(blu_ray,dvd,digital,other) AS owned
+                                FROM movies AS m 
+                                  JOIN users_movies AS um ON um.movie_id=m.id 
+                                WHERE um.user_id=:user_id) AS umm");
       $stmt->bindParam(":user_id", $userId);
       $stmt->execute();
       $userStats = [];
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $userStats[] = $row;
+        $userStats["movie_stats"] = $row;
       }
+      
+      $stmt = $dbh->prepare("SELECT SUM(times_watched) AS episodes_seen,
+                                SUM(time_watching_episodes) AS episodes_seen_runtime,
+                                SUM(seen) AS unique_episodes_seen,
+                                SUM(episode_runtime) AS unique_episodes_seen_runtime,
+                                SUM(owned) AS owned_episodes,
+                                SUM(runtime*owned) AS owned_episodes_runtime
+                              FROM (SELECT tv.episode_run_time AS runtime, 
+                                    watched AS times_watched, 
+                                    LEAST(watched, 1) AS seen,
+                                    (tv.episode_run_time*LEAST(watched, 1)) AS episode_runtime,
+                                    (tv.episode_run_time*watched) AS time_watching_episodes,
+                                    GREATEST(blu_ray,dvd,digital,other) AS owned
+                                  FROM users_tv_episodes AS ute
+                                    JOIN tv_episodes AS te ON te.id=ute.tv_episode_id
+                                    JOIN tv_sources AS ts ON ts.tmdb_id=te.tmdb_tv_id
+                                    JOIN tv ON tv.id=ts.tv_id
+                                  WHERE ute.user_id=:user_id) AS tvstats");
+      $stmt->bindParam(":user_id", $userId);
+      $stmt->execute();
+      while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $userStats["tv_stats"] = $row;
+      }
+      
+      
       $response["message"] = $userStats;
       header('HTTP/1.1 200 OK');
       $response['status'] = 200;
