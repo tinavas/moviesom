@@ -25,9 +25,7 @@
   $response['status'] = 500;
   
   $requestJson = json_decode(file_get_contents("php://input"), true);
-
   if (isset($requestJson['title']) && isset($requestJson['runtime']) && isset($requestJson['release_date']) && 
-      isset($requestJson['backdrop_path']) && isset($requestJson['poster_path']) &&
       isset($requestJson['tmdb_id']) && isset($requestJson['imdb_id']) &&
       isset($requestJson['tmdb_rating']) && isset($requestJson['imdb_rating']) && 
       isset($requestJson['tmdb_votes']) && isset($requestJson['imdb_votes'])) {

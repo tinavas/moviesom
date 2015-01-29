@@ -32,7 +32,6 @@
   if (isset($requestJson['title']) && isset($requestJson['episode_run_time']) && 
       isset($requestJson['first_air_date']) && isset($requestJson['last_air_date']) && 
       isset($requestJson['number_of_episodes']) && isset($requestJson['number_of_seasons']) && 
-      isset($requestJson['backdrop_path']) && isset($requestJson['poster_path']) &&
       isset($requestJson['tmdb_id']) && isset($requestJson['imdb_id']) &&
       isset($requestJson['tmdb_rating']) && isset($requestJson['imdb_rating']) && 
       isset($requestJson['tmdb_votes']) && isset($requestJson['imdb_votes'])) {
