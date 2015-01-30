@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Machine: 127.0.0.1
--- Genereertijd: 19 jan 2015 om 23:38
+-- Genereertijd: 30 jan 2015 om 13:41
 -- Serverversie: 5.5.24-log
 -- PHP-versie: 5.6.0
 
@@ -137,6 +137,19 @@ CREATE TABLE IF NOT EXISTS `page_settings` (
 -- --------------------------------------------------------
 
 --
+-- Tabelstructuur voor tabel `reset_password_tokens`
+--
+
+CREATE TABLE IF NOT EXISTS `reset_password_tokens` (
+  `email` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expire_date` datetime NOT NULL,
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Tabelstructuur voor tabel `tv`
 --
 
@@ -263,6 +276,22 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `users_connections`
+--
+
+CREATE TABLE IF NOT EXISTS `users_connections` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `user_id2` bigint(20) NOT NULL,
+  `consent` tinyint(1) NOT NULL,
+  `consent2` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`,`user_id2`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
