@@ -65,6 +65,29 @@
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $ratings[] = $row;
       }
+      
+      // Get stats per season
+      $stmt = $dbh->prepare("SELECT te.tmdb_tv_id, te.season_number, COUNT(*) AS watched FROM tv_episodes AS te
+                                JOIN users_tv_episodes AS ute ON ute.tv_episode_id=te.id
+                              WHERE te.tmdb_tv_id IN ({$tmdbWhereIn})
+                                AND ute.user_id=?
+                                AND ute.watched>0
+                              GROUP BY te.season_number
+                              ORDER BY te.season_number");
+      $pos = 0;
+      foreach ($requestJson['tv_tmdb_ids'] as $k => $id) {
+        $pos++;
+        $stmt->bindValue($pos, $id["id"]);
+      }
+      $pos++;
+      $stmt->bindValue($pos, $userId);
+
+      $stmt->execute();
+      $ratings["seasons"] = [];
+      while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $ratings["seasons"][] = $row;
+      }
+      
       $response["message"] = $ratings;
       
       if($dbh->commit()) {
