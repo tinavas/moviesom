@@ -50,6 +50,7 @@
                                 JOIN tv ON tv.id=ts.tv_id
                               WHERE te.tmdb_tv_id IN ({$tmdbWhereIn})
                                 AND ute.user_id=?
+                                AND ute.watched>0
                                 AND te.season_number>0
                               GROUP BY te.tmdb_tv_id");
       $pos = 0;
