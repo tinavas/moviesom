@@ -72,7 +72,7 @@
                               WHERE te.tmdb_tv_id IN ({$tmdbWhereIn})
                                 AND ute.user_id=?
                                 AND ute.watched>0
-                              GROUP BY te.season_number
+                              GROUP BY te.tmdb_tv_id, te.season_number
                               ORDER BY te.season_number");
       $pos = 0;
       foreach ($requestJson['tv_tmdb_ids'] as $k => $id) {
