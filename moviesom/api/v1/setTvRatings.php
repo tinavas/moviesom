@@ -4,6 +4,7 @@
    * Expects JSON as payload I.e.:
    *  {
    *    "title": "Fight Club"
+   *    "original_title": "Fight Club"
    *    "episode_run_time": "[22, 25]",
    *    "tmdb_id": 7468,
    *    "first_air_date": "1999-10-14",
@@ -29,7 +30,7 @@
   
   $requestJson = json_decode(file_get_contents("php://input"), true);
 
-  if (isset($requestJson['title']) && isset($requestJson['episode_run_time']) && 
+  if (isset($requestJson['title']) && isset($requestJson['original_title']) && isset($requestJson['episode_run_time']) && 
       isset($requestJson['first_air_date']) && isset($requestJson['last_air_date']) && 
       isset($requestJson['number_of_episodes']) && isset($requestJson['number_of_seasons']) && 
       isset($requestJson['tmdb_id']) && isset($requestJson['imdb_id']) &&
@@ -58,8 +59,9 @@
       // We create the movie to obtain a movie id if it doesn't exist already.
       if(isset($tv_id) === false) {
         // Insert record into tv
-        $stmt = $dbh->prepare("INSERT INTO tv (title, episode_run_time, number_of_episodes, number_of_seasons, first_air_date, last_air_date, backdrop_path, poster_path) VALUES (:title, :episode_run_time, :number_of_episodes, :number_of_seasons, :first_air_date, :last_air_date, :backdrop_path, :poster_path)");
+        $stmt = $dbh->prepare("INSERT INTO tv (title, original_title, episode_run_time, number_of_episodes, number_of_seasons, first_air_date, last_air_date, backdrop_path, poster_path) VALUES (:title, :original_title, :episode_run_time, :number_of_episodes, :number_of_seasons, :first_air_date, :last_air_date, :backdrop_path, :poster_path)");
         $stmt->bindParam(":title", $requestJson["title"]);
+        $stmt->bindParam(":original_title", $requestJson["original_title"]);
         $stmt->bindParam(":episode_run_time", $avgEpisodeRunTime);
         $stmt->bindParam(":number_of_episodes", $requestJson["number_of_episodes"]);
         $stmt->bindParam(":number_of_seasons", $requestJson["number_of_seasons"]);
@@ -70,7 +72,9 @@
         $stmt->execute();
         $tv_id = $dbh->lastInsertId();
       } else {
-        $stmt = $dbh->prepare("UPDATE tv SET episode_run_time=:episode_run_time, number_of_episodes=:number_of_episodes, number_of_seasons=:number_of_seasons, first_air_date=:first_air_date, last_air_date=:last_air_date, backdrop_path=:backdrop_path, poster_path=:poster_path WHERE id=:tv_id");
+        $stmt = $dbh->prepare("UPDATE tv SET title=:title, original_title=:original_title, episode_run_time=:episode_run_time, number_of_episodes=:number_of_episodes, number_of_seasons=:number_of_seasons, first_air_date=:first_air_date, last_air_date=:last_air_date, backdrop_path=:backdrop_path, poster_path=:poster_path WHERE id=:tv_id");
+        $stmt->bindParam(":title", $requestJson["title"]);
+        $stmt->bindParam(":original_title", $requestJson["original_title"]);
         $stmt->bindParam(":episode_run_time", $avgEpisodeRunTime);
         $stmt->bindParam(":number_of_episodes", $requestJson["number_of_episodes"]);
         $stmt->bindParam(":number_of_seasons", $requestJson["number_of_seasons"]);
