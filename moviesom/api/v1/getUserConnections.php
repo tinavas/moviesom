@@ -31,7 +31,14 @@
     try {
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-      $stmt = $dbh->prepare("SELECT * FROM users_connections WHERE (user_id=:user_id OR user_id2=:user_id) AND consent=1 AND consent2=1");
+      
+      // Consented connections
+      $stmt = $dbh->prepare("SELECT :user_id AS self_id, uc.*, u.id AS uid1, u2.id AS uid2, 
+                                u.username AS user1, u2.username AS user2 
+                              FROM users_connections AS uc
+                                JOIN users AS u ON u.id=uc.user_id
+                                JOIN users AS u2 ON u2.id=uc.user_id2
+                              WHERE (user_id=:user_id OR user_id2=:user_id) AND consent=1 AND consent2=1");
       $stmt->bindParam(":user_id", $userId);
       $stmt->execute();
       $userStats = [];
@@ -39,10 +46,15 @@
         $userStats["connections"] = $row;
       }
       
-      $stmt = $dbh->prepare("SELECT * FROM users_connections WHERE user_id2=:user_id AND (consent2=0)");
+      // Outstanding requests.
+      $stmt = $dbh->prepare("SELECT :user_id AS self_id, uc.*, u.id AS uid1, u2.id AS uid2, 
+                                u.username AS user1, u2.username AS user2 
+                              FROM users_connections AS uc
+                                JOIN users AS u ON u.id=uc.user_id
+                                JOIN users AS u2 ON u2.id=uc.user_id2
+                              WHERE ((user_id=:user_id  AND (consent=1 AND consent2=0)) OR (user_id2=:user_id  AND (consent=0 AND consent2=1)))");
       $stmt->bindParam(":user_id", $userId);
       $stmt->execute();
-      $userStats = [];
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $userStats["requests"] = $row;
       }

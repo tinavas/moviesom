@@ -37,7 +37,9 @@
       
       $connection = [];
       
-      $stmt = $dbh->prepare("SELECT uc.id, u.id AS uid, u2.id AS uid2, u.username AS user1, u2.username AS user2, uc.consent, uc.consent2 FROM users_connections AS uc
+      $stmt = $dbh->prepare("SELECT :user_id AS self_id, uc.*, u.id AS uid1, u2.id AS uid2, 
+                                u.username AS user1, u2.username AS user2
+                              FROM users_connections AS uc
                                 JOIN users AS u ON u.id=uc.user_id 
                                 JOIN users AS u2 ON u2.id=uc.user_id2 
                               WHERE (user_id=:user_id AND user_id2=(SELECT id FROM users WHERE username=:email)) 
@@ -50,7 +52,7 @@
       $consent2 = 0;
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $id = $row["id"];
-        if(intval($row["uid"]) == $userId) {
+        if(intval($row["uid1"]) == $userId) {
           $consent = 1;
           $row["consent"] = "1";
         }
@@ -73,7 +75,9 @@
         $connection_id = $dbh->lastInsertId();
         
         // We now select the inserted.
-        $stmt = $dbh->prepare("SELECT uc.id, u.id AS uid, u2.id AS uid2, u.username AS user1, u2.username AS user2, uc.consent, uc.consent2 FROM users_connections AS uc
+        $stmt = $dbh->prepare("SELECT :user_id AS self_id, uc.*, u.id AS uid, u2.id AS uid2, 
+                                  u.username AS user1, u2.username AS user2
+                                FROM users_connections AS uc
                                   JOIN users AS u ON u.id=uc.user_id 
                                   JOIN users AS u2 ON u2.id=uc.user_id2 
                                 WHERE uc.id=:id");
