@@ -82,6 +82,7 @@
                                   JOIN users AS u2 ON u2.id=uc.user_id2 
                                 WHERE uc.id=:id");
         $stmt->bindParam(":id", $connection_id);
+        $stmt->bindParam(":user_id", $userId);
         $stmt->execute();
         
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
