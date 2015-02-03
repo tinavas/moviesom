@@ -4,6 +4,13 @@
    * Expects JSON as payload I.e.:
    *  {
    *    "token": "d967a19940bdc4d498d0420a9fb12802ab5857a0a634ab73ae8984c5cf46ab3f9322dd5c1c3f069cc9d226ce47112747976c289cf6ae7b41a8ac72a7dc69c83f"
+   *    "watched_filter": "true",
+   *    "blu_ray_filter": "false",
+   *    "dvd_filter": "false",
+   *    "digital_filter": "false",
+   *    "other_filter": "false",
+   *    "lend_out_filter": "false",
+   *    "page": 0,
    *  }
    */
 
@@ -43,9 +50,48 @@
         $dbh->beginTransaction();
       }
 
+      $defaultFilter = "(watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0)";
+      
       $searchString = "%%";
       if(isset($requestJson["query"])) {
-        $searchString = "%{$requestJson["query"]}%";
+        $searchString .= "%{$requestJson["query"]}%";
+      }
+      
+      $filterString = "";
+      if(isset($requestJson["watched_filter"]) && strcasecmp($requestJson["watched_filter"], "true") == 0) {
+        $defaultFilter = "";
+        $filterString .= "OR watched>0 ";
+      }
+      
+      if(isset($requestJson["blu_ray_filter"]) && strcasecmp($requestJson["blu_ray_filter"], "true") == 0) {
+        $defaultFilter = "";
+        $filterString .= "OR blu_ray>0 ";
+      }
+      
+      if(isset($requestJson["dvd_filter"]) && strcasecmp($requestJson["dvd_filter"], "true") == 0) {
+        $defaultFilter = "";
+        $filterString .= "OR dvd>0 ";
+      }
+      
+      if(isset($requestJson["digital_filter"]) && strcasecmp($requestJson["digital_filter"], "true") == 0) {
+        $defaultFilter = "";
+        $filterString .= "OR digital>0 ";
+      }
+      
+      if(isset($requestJson["other_filter"]) && strcasecmp($requestJson["other_filter"], "true") == 0) {
+        $defaultFilter = "";
+        $filterString .= "OR other>0 ";
+      }
+      
+      if(isset($requestJson["lend_out_filter"]) && strcasecmp($requestJson["lend_out_filter"], "true") == 0) {
+        $defaultFilter = "";
+        $filterString .= "OR CHAR_LENGTH(lend_out)>0 ";
+      }
+      
+      $filterString .= $defaultFilter;
+      $OR = "OR";
+      if(strpos($filterString, "OR") == 0) {
+        $filterString = substr( $filterString, 0, strpos( $filterString, $OR)) . "" . substr( $filterString, strpos( $filterString, $OR) + strlen( $OR));
       }
       
       // Get total count of movies and tv series
@@ -56,8 +102,10 @@
                               users_movies AS um 
                                 JOIN movies AS m ON m.id=um.movie_id
                               WHERE um.user_id=:user_id
-                                AND m.title LIKE :search_title 
-                                AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0)
+                                AND (m.title LIKE :search_title OR m.original_title LIKE :search_title)
+                                AND (
+                                  {$filterString}
+                                )
                               UNION ALL
                               SELECT te.id
                               FROM
@@ -67,7 +115,10 @@
                                 JOIN tv ON tv.id=ts.tv_id
                               WHERE ute.user_id=:user_id
                                 AND (tv.title LIKE :search_title OR te.title LIKE :search_title)
-                                AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0)) subquery");
+                                AND (
+                                  {$filterString}
+                                )
+                              ) subquery");
       $stmt->bindParam(":user_id", $userId);
       $stmt->bindParam(":search_title", $searchString, PDO::PARAM_STR);
       $stmt->execute();
@@ -79,20 +130,23 @@
       // SELECT movies and tv series
       $stmt = $dbh->prepare("SELECT * FROM
                               (SELECT 
-                                m.id, m.title, m.runtime, '' AS number_of_episodes, '' as number_of_seasons, release_date, '' AS last_air_date, 
-                                backdrop_path, poster_path, '' AS episode_title, '' AS season_number, '' AS episode_number, '' AS air_date, 
+                                m.id, m.title, m.runtime, '' AS number_of_episodes, '' as number_of_seasons, release_date, '' AS last_air_date,
+                                backdrop_path, poster_path, '' AS episode_title, '' AS season_number, '' AS episode_number, '' AS air_date,
                                 um.tmdb_id, mr.rating, mr.votes, mr.updated, um.imdb_id,
                                 um.watched, um.want_to_watch, um.blu_ray, um.dvd, um.digital, um.other, um.lend_out,
                                 'movie' AS media_type
-                              FROM movie_ratings AS mr 
-                                JOIN movies AS m ON m.id=mr.movie_id 
-                                JOIN users_movies AS um ON um.movie_id=m.id 
-                              WHERE um.user_id=:user_id AND m.title LIKE :search_title 
-                                AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0) 
+                              FROM movie_ratings AS mr
+                                JOIN movies AS m ON m.id=mr.movie_id
+                                JOIN users_movies AS um ON um.movie_id=m.id
+                              WHERE um.user_id=:user_id 
+                                AND (m.title LIKE :search_title OR m.original_title LIKE :search_title)
+                                AND (
+                                  {$filterString}
+                                )
                                 AND um.tmdb_id=mr.source_id
                               UNION ALL
                               SELECT 
-                                tv.id AS tv_id, tv.title, tv.episode_run_time AS runtime, tv.number_of_episodes, tv.number_of_seasons, 
+                                tv.id AS tv_id, tv.title, tv.episode_run_time AS runtime, tv.number_of_episodes, tv.number_of_seasons,
                                 tv.first_air_date, tv.last_air_date, tv.backdrop_path, tv.poster_path, te.title AS episode_title,
                                 te.season_number, te.episode_number, te.air_date, te.tmdb_tv_id AS tmdb_id, ter.rating, ter.votes, ter.updated, ute.imdb_id,
                                 ute.watched, ute.want_to_watch, ute.blu_ray, ute.dvd, ute.digital, ute.other, ute.lend_out,
@@ -103,9 +157,11 @@
                                 JOIN tv_episode_ratings AS ter ON ter.tv_episode_id=te.id
                                 JOIN tv_sources AS ts ON ts.tmdb_id=te.tmdb_tv_id
                                 JOIN tv ON tv.id=ts.tv_id
-                              WHERE ute.user_id=:user_id 
-                                AND (tv.title LIKE :search_title OR te.title LIKE :search_title )
-                                AND (watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0) 
+                              WHERE ute.user_id=:user_id
+                                AND (tv.title LIKE :search_title OR tv.original_title LIKE :search_title OR te.title LIKE :search_title )
+                                AND (
+                                  {$filterString}
+                                )
                                 AND ter.source_id=tes.tmdb_id
                               GROUP BY tv.id) subquery
                             ORDER BY title LIMIT :offset, :results_per_page");
