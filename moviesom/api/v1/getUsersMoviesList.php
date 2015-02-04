@@ -57,6 +57,9 @@
         $searchString .= "%{$requestJson["query"]}%";
       }
       
+      /**
+       * FILTER
+       */
       $filterString = "";
       if(isset($requestJson["watched_filter"]) && strcasecmp($requestJson["watched_filter"], "true") == 0) {
         $defaultFilter = "";
@@ -94,6 +97,29 @@
         $filterString = substr( $filterString, 0, strpos( $filterString, $OR)) . "" . substr( $filterString, strpos( $filterString, $OR) + strlen( $OR));
       }
       
+      /**
+       * SORT
+       */
+      $sortString = "";
+      if(isset($requestJson["sort"])) {
+        $defaultSort = "";
+        switch($requestJson["sort"]) {
+          case "added":
+            $sortString .= "ORDER BY added DESC";
+            break;
+          case "updated":
+            $sortString .= "ORDER BY user_updated DESC";
+            break;
+          default:
+            $sortString = "ORDER BY title";
+            break;
+        }
+      }
+      
+      
+      /**
+       * SEARCH
+       */
       // Get total count of movies and tv series
       $stmt = $dbh->prepare("SELECT COUNT(*) AS total_results 
                               FROM 
@@ -133,7 +159,7 @@
                                 m.id, m.title, m.runtime, '' AS number_of_episodes, '' as number_of_seasons, release_date, '' AS last_air_date,
                                 backdrop_path, poster_path, '' AS episode_title, '' AS season_number, '' AS episode_number, '' AS air_date,
                                 um.tmdb_id, mr.rating, mr.votes, mr.updated, um.imdb_id,
-                                um.watched, um.want_to_watch, um.blu_ray, um.dvd, um.digital, um.other, um.lend_out,
+                                um.watched, um.want_to_watch, um.blu_ray, um.dvd, um.digital, um.other, um.lend_out, um.added, um.updated AS user_updated,
                                 'movie' AS media_type
                               FROM movie_ratings AS mr
                                 JOIN movies AS m ON m.id=mr.movie_id
@@ -149,7 +175,7 @@
                                 tv.id AS tv_id, tv.title, tv.episode_run_time AS runtime, tv.number_of_episodes, tv.number_of_seasons,
                                 tv.first_air_date, tv.last_air_date, tv.backdrop_path, tv.poster_path, te.title AS episode_title,
                                 te.season_number, te.episode_number, te.air_date, te.tmdb_tv_id AS tmdb_id, ter.rating, ter.votes, ter.updated, ute.imdb_id,
-                                ute.watched, ute.want_to_watch, ute.blu_ray, ute.dvd, ute.digital, ute.other, ute.lend_out,
+                                ute.watched, ute.want_to_watch, ute.blu_ray, ute.dvd, ute.digital, ute.other, ute.lend_out, ute.added, ute.updated AS user_updated,
                                 'tv' AS media_type
                               FROM users_tv_episodes AS ute
                                 JOIN tv_episode_sources AS tes ON tes.tmdb_id=ute.tmdb_id
@@ -164,7 +190,8 @@
                                 )
                                 AND ter.source_id=tes.tmdb_id
                               GROUP BY tv.id) subquery
-                            ORDER BY title LIMIT :offset, :results_per_page");
+                              {$sortString}
+                            LIMIT :offset, :results_per_page");
       $stmt->bindParam(":user_id", $userId);
       $stmt->bindParam(":search_title", $searchString, PDO::PARAM_STR);
       $offset = (($page-1)*$resultsPerPage);
