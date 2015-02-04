@@ -4,7 +4,7 @@
    * Expects JSON as payload I.e.:
    *  {
    *    "token": "d967a19940bdc4d498d0420a9fb12802ab5857a0a634ab73ae8984c5cf46ab3f9322dd5c1c3f069cc9d226ce47112747976c289cf6ae7b41a8ac72a7dc69c83f",
-   *    "id": "18",
+   *    "email": "john@doe.com",
    *    "consent": "1"
    *  }
    */
@@ -28,7 +28,7 @@
     header('HTTP/1.1 401 Unauthorized');
     $response['message'] = 'Insufficient rights';
     $response['status'] = 401;
-  } else if (isset($requestJson['id']) && isset($requestJson['consent'])) {
+  } else if (isset($requestJson['email'])) {
     try {
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -43,9 +43,9 @@
                               FROM users_connections AS uc
                                 JOIN users AS u ON u.id=uc.user_id 
                                 JOIN users AS u2 ON u2.id=uc.user_id2 
-                              WHERE (user_id=:user_id AND user_id2=:id) 
-                                OR (user_id2=:user_id AND user_id=:id)");
-      $stmt->bindParam(":id", $requestJson["id"]);
+                              WHERE (user_id=:user_id AND user_id2=(SELECT id FROM users WHERE username=:email)) 
+                                OR (user_id2=:user_id AND user_id=(SELECT id FROM users WHERE username=:email))");
+      $stmt->bindParam(":email", $requestJson["email"]);
       $stmt->bindParam(":user_id", $userId);
       $stmt->execute();
       $connectionExists = false;
@@ -54,23 +54,49 @@
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $id = $row["id"];
         if(intval($row["uid1"]) == $userId) {
-          $consent = $requestJson['consent'];
-          $row["consent"] = $consent;
+          $consent = 1;
+          $row["consent"] = 1;
         }
         if(intval($row["uid2"]) == $userId) {
-          $consent2 = $requestJson['consent'];
-          $row["consent2"] = $consent2;
+          $consent2 = 1;
+          $row["consent2"] = 1;
         }
         $connection[] = $row;
         $connectionExists = true;
         break;
       }
 
-      $stmt = $dbh->prepare("UPDATE users_connections SET consent=:consent, consent2=:consent2 WHERE id=:id");
-      $stmt->bindParam(":id", $id);
-      $stmt->bindParam(":consent", $consent);
-      $stmt->bindParam(":consent2", $consent2);
-      $stmt->execute();
+      if($connectionExists === false) {
+        $stmt = $dbh->prepare("INSERT INTO users_connections (user_id, user_id2, consent, consent2) 
+                                VALUES (:user_id, (SELECT id FROM users WHERE username=:email), 1, 0)");
+        $stmt->bindParam(":email", $requestJson["email"]);
+        $stmt->bindParam(":user_id", $userId);
+        $stmt->execute();
+        
+        $connection_id = $dbh->lastInsertId();
+        
+        // We now select the inserted.
+        $stmt = $dbh->prepare("SELECT :user_id AS self_id, uc.*, u.id AS uid1, u2.id AS uid2, 
+                                  u.username AS user1, u2.username AS user2
+                                FROM users_connections AS uc
+                                  JOIN users AS u ON u.id=uc.user_id 
+                                  JOIN users AS u2 ON u2.id=uc.user_id2 
+                                WHERE uc.id=:id");
+        $stmt->bindParam(":id", $connection_id);
+        $stmt->bindParam(":user_id", $userId);
+        $stmt->execute();
+        
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+          $connection[] = $row;
+          break;
+        }
+      } else {
+        $stmt = $dbh->prepare("UPDATE users_connections SET consent=:consent, consent2=:consent2 WHERE id=:id");
+        $stmt->bindParam(":id", $id);
+        $stmt->bindParam(":consent", $consent);
+        $stmt->bindParam(":consent2", $consent2);
+        $stmt->execute();
+      }
 
       $response['message'] = $connection;
       
