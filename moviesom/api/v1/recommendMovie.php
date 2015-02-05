@@ -1,52 +1,76 @@
 <?php
   /**
-   * Send reset password mail.
+   * Recommend movie to users.
    * Expects JSON as payload I.e.:
    *  {
-   *    "username": "john@doe.com"
+   *    "token": "d967a19940bdc4d498d0420a9fb12802ab5857a0a634ab73ae8984c5cf46ab3f9322dd5c1c3f069cc9d226ce47112747976c289cf6ae7b41a8ac72a7dc69c83f",
+   *    "recommend_to": [
+   *      {"id": "18", "recommend": "1"},
+   *      {"id": "19", "recommend": "0"}
+   *    ],
+   *    "movie_tmdb_id": "550"
    *  }
    */
-
-
 
   header('HTTP/1.1 500 Internal Server Error');
   header('Content-type: application/json');
   $response = [];
   $response['status'] = 500;
-
-  $requestJson = json_decode(file_get_contents("php://input"), true);
   
-  // Make sure username is set and is a valid e-mail address.
-  if(isset($requestJson['username']) && filter_var($requestJson['username'], FILTER_VALIDATE_EMAIL)) {
+  $requestJson = json_decode(file_get_contents("php://input"), true);
+
+  // Login token should be valid.
+  if(isset($requestJson['token']) && strlen($requestJson['token']) > 0) {
+    $credentials->checkLoginToken($requestJson['token']);
+  }
+  
+  $loggedIn = $credentials->hasMoviesomAccess();
+  $userId = $credentials->getUserId();
+  
+  if($loggedIn === false) {
+    header('HTTP/1.1 401 Unauthorized');
+    $response['message'] = 'Insufficient rights';
+    $response['status'] = 401;
+  } else if (isset($requestJson['recommend_to']) && isset($requestJson['movie_tmdb_id'])) {
     try {
-      $token = hash("sha512", rand() . uniqid("moviesomUID_", true));
-      
       $dbh = $db->connect();
-      $stmt = $dbh->prepare("SELECT username FROM users WHERE username=:username LIMIT 1");
-      $stmt->bindParam(":username", $requestJson['username']);
-      $stmt->execute();
-      
-      while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $expireDate = date('Y-m-d H:i:s',strtotime("Today +1 day"));
-        $stmt2 = $dbh->prepare("INSERT INTO reset_password_tokens (email, token, expire_date) VALUES (:email, :token, :expire_date) ON DUPLICATE KEY UPDATE token=:token, expire_date=:expire_date");
-        $stmt2->bindParam(":email", $requestJson['username']);
-        $stmt2->bindParam(":token", $token);
-        $stmt2->bindParam(":expire_date", $expireDate);
-        $stmt2->execute();
-        
-        // To send HTML mail, the Content-type header must be set
-        $headers  = 'MIME-Version: 1.0' . "\r\n";
-        $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+      $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+      if ($dbh->inTransaction() === false) {
+        $dbh->beginTransaction();
+      }
+    
+      foreach($requestJson["recommend_to"] as $recommend_to) {
+        if(strcasecmp($recommend_to["recommend"], "1") == 0) {
+          $stmt = $dbh->prepare("INSERT IGNORE INTO recommend_movies (recommend_by, recommend_to, tmdb_id) 
+                                  VALUES (:user_id, :recommend_to, :tmdb_id)");
+          $stmt->bindParam(":tmdb_id", $requestJson["movie_tmdb_id"]);
+          $stmt->bindParam(":recommend_to", $recommend_to["id"]);
+          $stmt->bindParam(":user_id", $userId);
+          $stmt->execute();
+          
+          $stmt = $dbh->prepare("SELECT (SELECT username FROM users WHERE id=:user_id) AS mailFrom, (SELECT username FROM users WHERE id=:recommend_to) AS mailTo");
+          $stmt->bindParam(":recommend_to", $recommend_to["id"]);
+          $stmt->bindParam(":user_id", $userId);
+          $stmt->execute();
+          
+          while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $mailTo = $row["mailTo"];
+            $mailFrom = $row["mailFrom"];
+          }
 
-        // Additional headers
-        $headers .= 'From: MovieSom <webmaster@moviesom.com>' . "\r\n";
+          // To send HTML mail, the Content-type header must be set
+          $headers  = 'MIME-Version: 1.0' . "\r\n";
+          $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
-        $protocol = explode("/", $_SERVER['SERVER_PROTOCOL']);
-        $protocol = strtolower(array_shift($protocol));
-        if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
-          $protocol = "https";
-        }
-        $heredocMail = <<<EOT
+          // Additional headers
+          $headers .= 'From: MovieSom <webmaster@moviesom.com>' . "\r\n";
+
+          $protocol = explode("/", $_SERVER['SERVER_PROTOCOL']);
+          $protocol = strtolower(array_shift($protocol));
+          if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
+            $protocol = "https";
+          }
+          $heredocMail = <<<EOT
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -74,7 +98,7 @@
         <table bgcolor="#999999">
           <tr>
             <td><h1>MovieSom</h1></td>
-            <td align="right"><h6 class="collapse">Password Reset</h6></td>
+            <td align="right"><h6 class="collapse">Movie recommendation</h6></td>
           </tr>
         </table>
         </div>
@@ -96,11 +120,9 @@
         <tr>
           <td>
             <h3>Hi,</h3>
-            <p class="lead">You received this e-mail because a password reset request has been made on MovieSom.</p>
-            <p>If you have not made this request then please be aware that someone else might be trying to get entry to your account. Do not hesitate to contact us if you believe this is the case!</p>
-            <p>Use the following link to reset your password:</p>
-            <p><a href="{$protocol}://app.moviesom.com/passwordReset.html?resetToken={$token}">Reset password</a></p>
-            <p>Note: this link is only valid for 24 hours.</p>
+            <p class="lead">{$mailFrom} wants to recommend a movie for you to see.</p>
+            <p>Login to MovieSom to check out which movie it is!</p>
+            <p><a href="{$protocol}://app.moviesom.com/">MovieSom</a></p>
             <!-- Callout Panel -->
             <p class="callout">
               MovieSom: Your movie sommelier. Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">MovieSom.com</a>!
@@ -179,17 +201,29 @@
 </html>
 
 EOT;
+          
+          mail($mailTo, "Password reset", $heredocMail, $headers);
 
-        mail($requestJson['username'], "Password reset", $heredocMail, $headers);
+        } else {
+          $stmt = $dbh->prepare("DELETE FROM recommend_movies
+                                  WHERE recommend_by=:user_id AND recommend_to=:recommend_to AND tmdb_id=:tmdb_id");
+          $stmt->bindParam(":tmdb_id", $requestJson["movie_tmdb_id"]);
+          $stmt->bindParam(":recommend_to", $recommend_to["id"]);
+          $stmt->bindParam(":user_id", $userId);
+          $stmt->execute();
+        }
       }
       
-      $response['message'] = 'Reset password request succeeded';
-      header('HTTP/1.1 200 OK');
-      $response['status'] = 200;
+      if($dbh->commit()) {
+        header('HTTP/1.1 200 OK');
+        $response['status'] = 200;
+      } else {
+        $response['message'] = '';
+      }
     }
     catch(PDOException $e) {  
       $response['message'] = $e;
     }
   }
-
-    
+  
+?>
