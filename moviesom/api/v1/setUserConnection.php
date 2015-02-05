@@ -56,10 +56,12 @@
         if(intval($row["uid1"]) == $userId) {
           $consent = $requestJson['consent'];
           $row["consent"] = $consent;
+          $consent2 = $row["consent2"];
         }
         if(intval($row["uid2"]) == $userId) {
           $consent2 = $requestJson['consent'];
           $row["consent2"] = $consent2;
+          $consent = $row["consent"];
         }
         $connection[] = $row;
         $connectionExists = true;
