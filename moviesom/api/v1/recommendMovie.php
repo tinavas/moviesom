@@ -93,16 +93,14 @@
   <tr>
     <td></td>
     <td class="header container" >
-        
-        <div class="content">
+      <div class="content">
         <table bgcolor="#999999">
           <tr>
             <td><h1>MovieSom</h1></td>
             <td align="right"><h6 class="collapse">Movie recommendation</h6></td>
           </tr>
         </table>
-        </div>
-        
+      </div>
     </td>
     <td></td>
   </tr>
@@ -202,7 +200,7 @@
 
 EOT;
           
-          mail($mailTo, "Password reset", $heredocMail, $headers);
+          mail($mailTo, "Movie recommendation", $heredocMail, $headers);
 
         } else {
           $stmt = $dbh->prepare("DELETE FROM recommend_movies
