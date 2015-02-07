@@ -50,7 +50,7 @@
         $dbh->beginTransaction();
       }
 
-      $defaultFilter = "(watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0)";
+      $defaultFilter = "(watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0 OR recommend>0)";
       
       $searchString = "%%";
       if(isset($requestJson["query"])) {
@@ -89,6 +89,11 @@
       if(isset($requestJson["lend_out_filter"]) && strcasecmp($requestJson["lend_out_filter"], "true") == 0) {
         $defaultFilter = "";
         $filterString .= "OR CHAR_LENGTH(lend_out)>0 ";
+      }
+      
+      if(isset($requestJson["recommend_filter"]) && strcasecmp($requestJson["recommend_filter"], "true") == 0) {
+        $defaultFilter = "";
+        $filterString .= "OR recommend>0 ";
       }
       
       $filterString .= $defaultFilter;
@@ -159,7 +164,8 @@
                                 m.id, m.title, m.runtime, '' AS number_of_episodes, '' as number_of_seasons, release_date, '' AS last_air_date,
                                 backdrop_path, poster_path, '' AS episode_title, '' AS season_number, '' AS episode_number, '' AS air_date,
                                 um.tmdb_id, mr.rating, mr.votes, mr.updated, um.imdb_id,
-                                um.watched, um.want_to_watch, um.blu_ray, um.dvd, um.digital, um.other, um.lend_out, um.added, um.updated AS user_updated,
+                                um.watched, um.want_to_watch, um.blu_ray, um.dvd, um.digital, um.other, um.lend_out, um.recommend, 
+                                um.added, um.updated AS user_updated,
                                 'movie' AS media_type
                               FROM movie_ratings AS mr
                                 JOIN movies AS m ON m.id=mr.movie_id
@@ -175,7 +181,8 @@
                                 tv.id AS tv_id, tv.title, tv.episode_run_time AS runtime, tv.number_of_episodes, tv.number_of_seasons,
                                 tv.first_air_date, tv.last_air_date, tv.backdrop_path, tv.poster_path, te.title AS episode_title,
                                 te.season_number, te.episode_number, te.air_date, te.tmdb_tv_id AS tmdb_id, ter.rating, ter.votes, ter.updated, ute.imdb_id,
-                                ute.watched, ute.want_to_watch, ute.blu_ray, ute.dvd, ute.digital, ute.other, ute.lend_out, ute.added, ute.updated AS user_updated,
+                                ute.watched, ute.want_to_watch, ute.blu_ray, ute.dvd, ute.digital, ute.other, ute.lend_out, ute.recommend, 
+                                ute.added, ute.updated AS user_updated,
                                 'tv' AS media_type
                               FROM users_tv_episodes AS ute
                                 JOIN tv_episode_sources AS tes ON tes.tmdb_id=ute.tmdb_id

@@ -41,11 +41,26 @@
     
       foreach($requestJson["recommend_to"] as $recommend_to) {
         if(strcasecmp($recommend_to["recommend"], "1") == 0) {
+          // Recommend movie insertion
           $stmt = $dbh->prepare("INSERT IGNORE INTO recommend_movies (recommend_by, recommend_to, tmdb_id) 
                                   VALUES (:user_id, :recommend_to, :tmdb_id)");
           $stmt->bindParam(":tmdb_id", $requestJson["movie_tmdb_id"]);
           $stmt->bindParam(":recommend_to", $recommend_to["id"]);
           $stmt->bindParam(":user_id", $userId);
+          $stmt->execute();
+
+          // user movies insertion
+          $stmt = $dbh->prepare("INSERT INTO users_movies (user_id, movie_id, tmdb_id, imdb_id, recommend) 
+                                  SELECT :recommend_to, 
+                                      movie_id, 
+                                      tmdb_id, 
+                                      imdb_id, 
+                                      (SELECT COUNT(id) FROM recommend_movies WHERE recommend_to=:recommend_to AND tmdb_id=:tmdb_id) 
+                                    FROM movie_sources 
+                                    WHERE tmdb_id=:tmdb_id
+                                  ON DUPLICATE KEY UPDATE recommend=(SELECT COUNT(id) FROM recommend_movies WHERE recommend_to=:recommend_to AND tmdb_id=:tmdb_id)");
+          $stmt->bindParam(":tmdb_id", $requestJson["movie_tmdb_id"]);
+          $stmt->bindParam(":recommend_to", $recommend_to["id"]);
           $stmt->execute();
           
           $stmt = $dbh->prepare("SELECT (SELECT username FROM users WHERE id=:user_id) AS mailFrom, (SELECT username FROM users WHERE id=:recommend_to) AS mailTo");
@@ -89,15 +104,15 @@
 <body bgcolor="#FFFFFF">
 
 <!-- HEADER -->
-<table class="head-wrap" bgcolor="#999999">
+<table class="head-wrap" bgcolor="#333">
   <tr>
     <td></td>
     <td class="header container" >
       <div class="content">
-        <table bgcolor="#999999">
+        <table bgcolor="#333">
           <tr>
-            <td><h1>MovieSom</h1></td>
-            <td align="right"><h6 class="collapse">Movie recommendation</h6></td>
+            <td><h6 class="collapse" class="color: white;">MovieSom</h1></h6>
+            <td align="right"><h6 class="collapse" class="color: #999">Recommendation</h6></td>
           </tr>
         </table>
       </div>
@@ -119,8 +134,7 @@
           <td>
             <h3>Hi,</h3>
             <p class="lead">{$mailFrom} wants to recommend a movie for you to see.</p>
-            <p>Login to MovieSom to check out which movie it is!</p>
-            <p><a href="{$protocol}://app.moviesom.com/">MovieSom</a></p>
+            <p>Go to <a href="{$protocol}://app.moviesom.com/?tmdbMovieId={$requestJson["movie_tmdb_id"]}">MovieSom.com</a> to see which movie it is!</p>
             <!-- Callout Panel -->
             <p class="callout">
               MovieSom: Your movie sommelier. Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">MovieSom.com</a>!
