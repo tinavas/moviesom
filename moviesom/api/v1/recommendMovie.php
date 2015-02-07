@@ -111,8 +111,8 @@
       <div class="content">
         <table bgcolor="#333">
           <tr>
-            <td><h6 class="collapse" class="color: white;">MovieSom</h1></h6>
-            <td align="right"><h6 class="collapse" class="color: #999">Recommendation</h6></td>
+            <td><h6 class="collapse" style="color: white;">MovieSom</h1></h6>
+            <td align="right"><h6 class="collapse" style="color: #999">Recommendation</h6></td>
           </tr>
         </table>
       </div>
@@ -134,7 +134,8 @@
           <td>
             <h3>Hi,</h3>
             <p class="lead">{$mailFrom} wants to recommend a movie for you to see.</p>
-            <p>Go to <a href="{$protocol}://app.moviesom.com/?tmdbMovieId={$requestJson["movie_tmdb_id"]}">MovieSom.com</a> to see which movie it is!</p>
+            <p class="lead">Click <a href="{$protocol}://app.moviesom.com/?tmdbMovieId={$requestJson["movie_tmdb_id"]}">here</a> to see which movie it is.</p>
+            <p>You can also log in on <a href="{$protocol}://app.moviesom.com/">MovieSom.com</a> and find the recommendation in your Personal Collection overview.</p>
             <!-- Callout Panel -->
             <p class="callout">
               MovieSom: Your movie sommelier. Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">MovieSom.com</a>!
