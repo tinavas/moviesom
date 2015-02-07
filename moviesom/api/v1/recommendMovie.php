@@ -48,7 +48,8 @@
           $stmt->bindParam(":recommend_to", $recommend_to["id"]);
           $stmt->bindParam(":user_id", $userId);
           $stmt->execute();
-
+          $recommendId = $dbh->lastInsertId();
+          
           // user movies insertion
           $stmt = $dbh->prepare("INSERT INTO users_movies (user_id, movie_id, tmdb_id, imdb_id, recommend) 
                                   SELECT :recommend_to, 
@@ -73,19 +74,21 @@
             $mailFrom = $row["mailFrom"];
           }
 
-          // To send HTML mail, the Content-type header must be set
-          $headers  = 'MIME-Version: 1.0' . "\r\n";
-          $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+          // When new recommendation we send an e-mail.
+          if($recommendId != 0) {
+            // To send HTML mail, the Content-type header must be set
+            $headers  = 'MIME-Version: 1.0' . "\r\n";
+            $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
-          // Additional headers
-          $headers .= 'From: MovieSom <webmaster@moviesom.com>' . "\r\n";
+            // Additional headers
+            $headers .= 'From: MovieSom <webmaster@moviesom.com>' . "\r\n";
 
-          $protocol = explode("/", $_SERVER['SERVER_PROTOCOL']);
-          $protocol = strtolower(array_shift($protocol));
-          if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
-            $protocol = "https";
-          }
-          $heredocMail = <<<EOT
+            $protocol = explode("/", $_SERVER['SERVER_PROTOCOL']);
+            $protocol = strtolower(array_shift($protocol));
+            if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
+              $protocol = "https";
+            }
+            $heredocMail = <<<EOT
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -215,7 +218,8 @@
 
 EOT;
           
-          mail($mailTo, "Movie recommendation", $heredocMail, $headers);
+            mail($mailTo, "Movie recommendation", $heredocMail, $headers);
+          }
 
         } else {
           $stmt = $dbh->prepare("DELETE FROM recommend_movies
