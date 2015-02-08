@@ -104,16 +104,25 @@
       
       /**
        * SORT
+       * When recommend filter is turned on the date sorting work different than normal.
        */
       $sortString = "";
       if(isset($requestJson["sort"])) {
         $defaultSort = "";
         switch($requestJson["sort"]) {
           case "added":
-            $sortString .= "ORDER BY added DESC";
+            if(isset($requestJson["recommend_filter"]) && strcasecmp($requestJson["recommend_filter"], "true") == 0) {
+              $sortString .= "ORDER BY recommend_date ASC";
+            } else {
+              $sortString .= "ORDER BY added DESC";
+            }
             break;
           case "updated":
-            $sortString .= "ORDER BY user_updated DESC";
+            if(isset($requestJson["recommend_filter"]) && strcasecmp($requestJson["recommend_filter"], "true") == 0) {
+              $sortString .= "ORDER BY recommend_date DESC";
+            } else {
+              $sortString .= "ORDER BY user_updated DESC";
+            }
             break;
           default:
             $sortString = "ORDER BY title";
@@ -165,24 +174,26 @@
                                 backdrop_path, poster_path, '' AS episode_title, '' AS season_number, '' AS episode_number, '' AS air_date,
                                 um.tmdb_id, mr.rating, mr.votes, mr.updated, um.imdb_id,
                                 um.watched, um.want_to_watch, um.blu_ray, um.dvd, um.digital, um.other, um.lend_out, um.recommend, 
-                                um.added, um.updated AS user_updated,
+                                um.added, um.updated AS user_updated, rm.added AS recommend_date,
                                 'movie' AS media_type
                               FROM movie_ratings AS mr
                                 JOIN movies AS m ON m.id=mr.movie_id
                                 JOIN users_movies AS um ON um.movie_id=m.id
+                                LEFT JOIN recommend_movies AS rm ON rm.tmdb_id=um.tmdb_id
                               WHERE um.user_id=:user_id 
                                 AND (m.title LIKE :search_title OR m.original_title LIKE :search_title)
                                 AND (
                                   {$filterString}
                                 )
                                 AND um.tmdb_id=mr.source_id
+                                GROUP BY m.id
                               UNION ALL
                               SELECT 
                                 tv.id AS tv_id, tv.title, tv.episode_run_time AS runtime, tv.number_of_episodes, tv.number_of_seasons,
                                 tv.first_air_date, tv.last_air_date, tv.backdrop_path, tv.poster_path, te.title AS episode_title,
                                 te.season_number, te.episode_number, te.air_date, te.tmdb_tv_id AS tmdb_id, ter.rating, ter.votes, ter.updated, ute.imdb_id,
                                 ute.watched, ute.want_to_watch, ute.blu_ray, ute.dvd, ute.digital, ute.other, ute.lend_out, ute.recommend, 
-                                ute.added, ute.updated AS user_updated,
+                                ute.added, ute.updated AS user_updated, null AS recommend_date,
                                 'tv' AS media_type
                               FROM users_tv_episodes AS ute
                                 JOIN tv_episode_sources AS tes ON tes.tmdb_id=ute.tmdb_id
