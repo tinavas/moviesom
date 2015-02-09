@@ -119,7 +119,7 @@
         <table bgcolor="#333">
           <tr>
             <td><h6 class="collapse" style="color: white;">MovieSom</h1></h6>
-            <td align="right"><h6 class="collapse" style="color: #999">Connect</h6></td>
+            <td align="right"><h6 class="collapse" style="color: #999">Connected</h6></td>
           </tr>
         </table>
       </div>
@@ -140,9 +140,8 @@
         <tr>
           <td>
             <h3>Hi,</h3>
-            <p class="lead">{$fromMail} wants to connect with you.</p>
-            <p>Log in on <a href="{$protocol}://app.moviesom.com/">MovieSom.com</a> and accept the connection in the app settings.</p>
-            <p>Connecting with other users allows you to send and receive movie recommendations.</p>
+            <p class="lead">{$fromMail} has accepted your connection.</p>
+            <p>Log in on <a href="{$protocol}://app.moviesom.com/">MovieSom.com</a> and start recommending movies to your new connection.</p>
             <!-- Callout Panel -->
             <p class="callout">
               MovieSom: Your movie sommelier. Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">MovieSom.com</a>!
