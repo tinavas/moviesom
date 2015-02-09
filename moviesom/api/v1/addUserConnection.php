@@ -232,7 +232,7 @@
 </body>
 </html>
 EOT;
-        mail($requestJson["email"], "Movie connection request", $heredocMail, $headers);
+        mail($requestJson["email"], "Movie connection accepted", $heredocMail, $headers);
       } else {
         $stmt = $dbh->prepare("UPDATE users_connections SET consent=:consent, consent2=:consent2 WHERE id=:id");
         $stmt->bindParam(":id", $id);
