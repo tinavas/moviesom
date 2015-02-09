@@ -79,20 +79,20 @@
       $stmt->bindParam(":consent2", $consent2);
       $stmt->execute();
 
-    
-      // To send HTML mail, the Content-type header must be set
-      $headers  = 'MIME-Version: 1.0' . "\r\n";
-      $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+      if($requestJson['consent'] == 1) {
+        // To send HTML mail, the Content-type header must be set
+        $headers  = 'MIME-Version: 1.0' . "\r\n";
+        $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
-      // Additional headers
-      $headers .= 'From: MovieSom <webmaster@moviesom.com>' . "\r\n";
+        // Additional headers
+        $headers .= 'From: MovieSom <webmaster@moviesom.com>' . "\r\n";
 
-      $protocol = explode("/", $_SERVER['SERVER_PROTOCOL']);
-      $protocol = strtolower(array_shift($protocol));
-      if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
-        $protocol = "https";
-      }
-      $heredocMail = <<<EOT
+        $protocol = explode("/", $_SERVER['SERVER_PROTOCOL']);
+        $protocol = strtolower(array_shift($protocol));
+        if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
+          $protocol = "https";
+        }
+        $heredocMail = <<<EOT
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -220,8 +220,8 @@
 </body>
 </html>
 EOT;
-      mail($toMail, "Movie connection request", $heredocMail, $headers);
-
+        mail($toMail, "Movie connection request", $heredocMail, $headers);
+      }
       
       
       $response['message'] = $connection;
