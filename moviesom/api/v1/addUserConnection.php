@@ -22,8 +22,8 @@
   }
   
   $loggedIn = $credentials->hasMoviesomAccess();
-  $userId = $credentials->getUserId();  
-  $username = $credentials->getUsername();  
+  $userId = $credentials->getUserId();
+  $username = $credentials->getUsername();
   
   if($loggedIn === false) {
     header('HTTP/1.1 401 Unauthorized');
@@ -92,20 +92,19 @@
           break;
         }
         
-        if($recommendId != 0) {
-          // To send HTML mail, the Content-type header must be set
-          $headers  = 'MIME-Version: 1.0' . "\r\n";
-          $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+        // To send HTML mail, the Content-type header must be set
+        $headers  = 'MIME-Version: 1.0' . "\r\n";
+        $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
-          // Additional headers
-          $headers .= 'From: MovieSom <webmaster@moviesom.com>' . "\r\n";
+        // Additional headers
+        $headers .= 'From: MovieSom <webmaster@moviesom.com>' . "\r\n";
 
-          $protocol = explode("/", $_SERVER['SERVER_PROTOCOL']);
-          $protocol = strtolower(array_shift($protocol));
-          if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
-            $protocol = "https";
-          }
-          $heredocMail = <<<EOT
+        $protocol = explode("/", $_SERVER['SERVER_PROTOCOL']);
+        $protocol = strtolower(array_shift($protocol));
+        if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
+          $protocol = "https";
+        }
+        $heredocMail = <<<EOT
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -233,9 +232,7 @@
 </body>
 </html>
 EOT;
-        
-          mail($requestJson["email"], "Movie connection request", $heredocMail, $headers);
-        }
+        mail($requestJson["email"], "Movie connection request", $heredocMail, $headers);
       } else {
         $stmt = $dbh->prepare("UPDATE users_connections SET consent=:consent, consent2=:consent2 WHERE id=:id");
         $stmt->bindParam(":id", $id);
