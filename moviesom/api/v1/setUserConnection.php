@@ -219,7 +219,7 @@
 </body>
 </html>
 EOT;
-        mail($toMail, "Movie connection request", $heredocMail, $headers);
+        mail($toMail, "Movie connection accepted", $heredocMail, $headers);
       }
       
       
