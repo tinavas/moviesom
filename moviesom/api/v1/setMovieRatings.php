@@ -24,12 +24,7 @@
   header('Content-type: application/json');
   $response = [];
   $response['status'] = 500;
-  var_dump($requestJson);
-  var_dump(isset($requestJson['title']) && isset($requestJson['original_title']));
-  var_dump(isset($requestJson['runtime']) && isset($requestJson['release_date']));
-  var_dump(isset($requestJson['tmdb_id']) && isset($requestJson['imdb_id']));
-  var_dump(isset($requestJson['tmdb_rating']) && isset($requestJson['imdb_rating']));
-  var_dump(isset($requestJson['tmdb_votes']) && isset($requestJson['imdb_votes']));
+  
   $requestJson = json_decode(file_get_contents("php://input"), true);
   if (isset($requestJson['title']) && isset($requestJson['original_title']) && 
       isset($requestJson['runtime']) && isset($requestJson['release_date']) && 
