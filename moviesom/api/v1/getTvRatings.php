@@ -45,8 +45,9 @@
       if(strlen($tmdbWhereIn) == 0) $tmdbWhereIn = "NULL";
       $imdbWhereIn = (count($requestJson['tv_imdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_imdb_ids']), '?')) : "";
       if(strlen($imdbWhereIn) == 0) $imdbWhereIn = "NULL";
-      $stmt = $dbh->prepare("SELECT * FROM tv_ratings AS tr 
+      $stmt = $dbh->prepare("SELECT tr.*, ts.*, tv.episode_run_time AS runtime FROM tv_ratings AS tr 
                                 JOIN tv_sources AS ts ON ts.tv_id=tr.tv_id 
+                                JOIN tv ON tv.id=tr.tv_id 
                               WHERE tr.tv_id 
                                 IN(SELECT m.id FROM tv AS m 
                                       JOIN tv_sources AS ts ON ts.tv_id=m.id 
