@@ -36,10 +36,11 @@
         }
         $token = $credentials ->generateNewLoginToken();
         $userId = $credentials->getUserId();
-        $stmt = $dbh->prepare("INSERT login_tokens (user_id, token, ip) VALUES (:user_id, :token, :ip) ON DUPLICATE KEY UPDATE token=:token");
+        $stmt = $dbh->prepare("INSERT login_tokens (user_id, token, ip, user_agent) VALUES (:user_id, :token, :ip, :user_agent) ON DUPLICATE KEY UPDATE token=:token");
         $stmt->bindParam(":user_id", $userId);
         $stmt->bindParam(":token", $token);
         $stmt->bindParam(":ip", $_SERVER['REMOTE_ADDR']);
+        $stmt->bindParam(":user_agent", $requestJson['user_agent']);
         $stmt->execute();
         
         if($dbh->commit()) {
