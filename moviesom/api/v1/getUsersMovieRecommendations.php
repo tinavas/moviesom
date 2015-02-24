@@ -46,7 +46,7 @@
                               FROM users_connections AS uc
                                 JOIN users AS u ON u.id=uc.user_id
                                 JOIN users AS u2 ON u2.id=uc.user_id2
-                              WHERE (user_id=:user_id OR user_id2=:user_id)");
+                              WHERE (user_id=:user_id OR user_id2=:user_id) AND uc.consent=1 AND uc.consent2=1");
       $stmt->bindParam(":tmdb_id", $requestJson['movie_tmdb_id']);
       $stmt->bindParam(":user_id", $userId);
       $stmt->execute();
