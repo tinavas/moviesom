@@ -61,6 +61,7 @@
        * FILTER
        */
       $filterString = "";
+      $orWhereString = "";
       if(isset($requestJson["watched_filter"]) && strcasecmp($requestJson["watched_filter"], "true") == 0) {
         $defaultFilter = "";
         $filterString .= "OR watched>0 ";
@@ -94,6 +95,12 @@
       if(isset($requestJson["recommend_filter"]) && strcasecmp($requestJson["recommend_filter"], "true") == 0) {
         $defaultFilter = "";
         $filterString .= "OR recommend>0 ";
+      }
+      
+      if(isset($requestJson["note_filter"]) && strcasecmp($requestJson["note_filter"], "true") == 0) {
+        $defaultFilter = "";
+        $filterString .= "OR CHAR_LENGTH(note)>0 ";
+        $orWhereString .= " OR note LIKE :search_title ";
       }
       
       $filterString .= $defaultFilter;
@@ -146,6 +153,7 @@
                                 AND (
                                   {$filterString}
                                 )
+                                {$orWhereString}
                               UNION ALL
                               SELECT te.id
                               FROM
@@ -158,6 +166,7 @@
                                 AND (
                                   {$filterString}
                                 )
+                                {$orWhereString}
                               ) subquery");
       $stmt->bindParam(":user_id", $userId);
       $stmt->bindParam(":search_title", $searchString, PDO::PARAM_STR);
@@ -185,6 +194,7 @@
                                 AND (
                                   {$filterString}
                                 )
+                                {$orWhereString}
                                 AND um.tmdb_id=mr.source_id
                                 GROUP BY m.id
                               UNION ALL
@@ -206,6 +216,7 @@
                                 AND (
                                   {$filterString}
                                 )
+                                {$orWhereString}
                                 AND ter.source_id=tes.tmdb_id
                               GROUP BY tv.id) subquery
                               {$sortString}
