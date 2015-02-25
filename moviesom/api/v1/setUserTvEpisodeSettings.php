@@ -73,7 +73,7 @@
                                 dvd=:dvd, 
                                 digital=:digital, 
                                 other=:other, 
-                                lend_out=:lend_out
+                                lend_out=:lend_out,
                                 note=:note");
       $stmt->bindParam(":user_id", $userId);
       $stmt->bindParam(":tv_episode_id", $tv_episode_id);
