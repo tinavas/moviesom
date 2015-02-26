@@ -56,7 +56,8 @@
         $stmt->bindParam(":title", $requestJson["title"]);
         $stmt->bindParam(":original_title", $requestJson["original_title"]);
         $stmt->bindParam(":runtime", $requestJson["runtime"]);
-        $stmt->bindParam(":release_date", $requestJson["release_date"]);
+        $releaseDate = $requestJson["release_date"]?$requestJson["release_date"]:NULL;
+        $stmt->bindParam(":release_date", $releaseDate);
         $stmt->bindParam(":backdrop_path", $requestJson["backdrop_path"]);
         $stmt->bindParam(":poster_path", $requestJson["poster_path"]);
         $stmt->execute();
@@ -66,7 +67,8 @@
         $stmt->bindParam(":title", $requestJson["title"]);
         $stmt->bindParam(":original_title", $requestJson["original_title"]);
         $stmt->bindParam(":runtime", $requestJson["runtime"]);
-        $stmt->bindParam(":release_date", $requestJson["release_date"]);
+        $releaseDate = $requestJson["release_date"]?$requestJson["release_date"]:NULL;
+        $stmt->bindParam(":release_date", $releaseDate);
         $stmt->bindParam(":movie_id", $movie_id);
         $stmt->bindParam(":backdrop_path", $requestJson["backdrop_path"]);
         $stmt->bindParam(":poster_path", $requestJson["poster_path"]);
