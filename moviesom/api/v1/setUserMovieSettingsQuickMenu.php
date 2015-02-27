@@ -7,7 +7,8 @@
    *    "movie_id": 550,
    *    "tmdb_id": 7468,
    *    "imdb_id": "tt0137523",
-   *    "watched": "2"
+   *    "watched": "2",
+   *    "clear_watchlist": false,
    *  }
    */
 
@@ -53,17 +54,18 @@
 
       // Insert the users movies settings
       $stmt = $dbh->prepare(
-        "INSERT INTO users_movies (user_id, movie_id, tmdb_id, imdb_id, watched)" .
-        " VALUES (:user_id, :movie_id, :tmdb_id, :imdb_id, :watched)" .
-        " ON DUPLICATE KEY UPDATE watched=:watched"
+        "INSERT INTO users_movies (user_id, movie_id, tmdb_id, imdb_id, watched, want_to_watch)" .
+        " VALUES (:user_id, :movie_id, :tmdb_id, :imdb_id, :watched, :want_to_watch)" .
+        " ON DUPLICATE KEY UPDATE watched=:watched, want_to_watch=:want_to_watch"
       );
       $stmt->bindParam(":user_id", $userId);
       $stmt->bindParam(":movie_id", $movie_id);
       $stmt->bindParam(":tmdb_id", $tmdb_id);
       $stmt->bindParam(":imdb_id", $imdb_id, PDO::PARAM_STR);
       $stmt->bindParam(":watched", $requestJson["watched"], PDO::PARAM_INT);
+      $stmt->bindParam(":want_to_watch", $requestJson["want_to_watch"]);
       $stmt->execute();
-
+      
       if($dbh->commit()) {
         header('HTTP/1.1 200 OK');
         $response['status'] = 200;
