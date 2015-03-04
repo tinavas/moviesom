@@ -77,16 +77,18 @@
       }
       
       // Insert movie genres
-      foreach($requestJson['genres'] as $value) {
-        $stmt = $dbh->prepare("INSERT INTO movie_genres 
-                                (movie_id, movie_tmdb_id, movie_imdb_id, genre_tmdb_id) 
-                                VALUES 
-                                (:movie_id, :movie_tmdb_id, :movie_imdb_id, :genre_tmdb_id)");
-        $stmt->bindParam(":movie_id", $movie_id);
-        $stmt->bindParam(":movie_tmdb_id", $requestJson['tmdb_id']);
-        $stmt->bindParam(":movie_imdb_id", $requestJson['imdb_id']);
-        $stmt->bindParam(":genre_tmdb_id", $value["id"]);
-        $stmt->execute();
+      if(isset($requestJson['genres'])) {
+        foreach($requestJson['genres'] as $value) {
+          $stmt = $dbh->prepare("INSERT INTO movie_genres 
+                                  (movie_id, movie_tmdb_id, movie_imdb_id, genre_tmdb_id) 
+                                  VALUES 
+                                  (:movie_id, :movie_tmdb_id, :movie_imdb_id, :genre_tmdb_id)");
+          $stmt->bindParam(":movie_id", $movie_id);
+          $stmt->bindParam(":movie_tmdb_id", $requestJson['tmdb_id']);
+          $stmt->bindParam(":movie_imdb_id", $requestJson['imdb_id']);
+          $stmt->bindParam(":genre_tmdb_id", $value["id"]);
+          $stmt->execute();
+        }
       }
       
       // Insert the ratings
