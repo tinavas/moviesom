@@ -56,6 +56,19 @@
         $userStats["movie_stats"] = $row;
       }
       
+      $stmt = $dbh->prepare("SELECT g.genre, COUNT(g.id) AS count 
+                              FROM genres AS g 
+                                JOIN movie_genres AS mg ON mg.genre_tmdb_id=g.tmdb_id
+                                JOIN movies AS m ON m.id=mg.movie_id
+                                JOIN users_movies AS um ON um.movie_id=m.id
+                              WHERE um.user_id=18 AND um.watched>0
+                              GROUP BY g.id");
+      $stmt->bindParam(":user_id", $userId);
+      $stmt->execute();
+      while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $userStats["movie_genres_stats"] = $row;
+      }
+      
       $stmt = $dbh->prepare("SELECT SUM(times_watched) AS episodes_seen,
                                 SUM(time_watching_episodes) AS episodes_seen_runtime,
                                 SUM(seen) AS unique_episodes_seen,
