@@ -56,13 +56,14 @@
         $userStats["movie_stats"] = $row;
       }
       
-      $stmt = $dbh->prepare("SELECT g.genre, COUNT(g.id) AS count 
+      $stmt = $dbh->prepare("SELECT g.genre, COUNT(g.id) AS num 
                               FROM genres AS g 
                                 JOIN movie_genres AS mg ON mg.genre_tmdb_id=g.tmdb_id
                                 JOIN movies AS m ON m.id=mg.movie_id
                                 JOIN users_movies AS um ON um.movie_id=m.id
-                              WHERE um.user_id=18 AND um.watched>0
-                              GROUP BY g.id");
+                              WHERE um.user_id=:user_id AND um.watched>0
+                              GROUP BY g.id
+                              ORDER BY num ASC");
       $stmt->bindParam(":user_id", $userId);
       $stmt->execute();
       $userStats["movie_genres_stats"] = [];
