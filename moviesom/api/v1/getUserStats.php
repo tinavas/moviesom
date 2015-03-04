@@ -66,9 +66,11 @@
                               ORDER BY num DESC");
       $stmt->bindParam(":user_id", $userId);
       $stmt->execute();
-      $userStats["movie_genres_stats"] = [];
+      $userStats["movie_genres_stats"]["total"] = 0;
+      $userStats["movie_genres_stats"]["genres"] = [];
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        array_push($userStats["movie_genres_stats"], $row);
+        array_push($userStats["movie_genres_stats"]["genres"], $row);
+        $userStats["movie_genres_stats"]["total"] += $row["num"];
       }
       
       $stmt = $dbh->prepare("SELECT SUM(times_watched) AS episodes_seen,
