@@ -69,6 +69,19 @@
         $stmt->bindParam(":still_path", $requestJson["still_path"]);
         $stmt->execute();
         $tv_episode_id = $dbh->lastInsertId();
+        
+        if($tv_episode_id == 0) {
+          $stmt = $dbh->prepare("SELECT id FROM tv_episodes 
+                                  WHERE tmdb_tv_id=:tmdb_tv_id AND season_number=:season_number AND episode_number=:episode_number");
+          $stmt->bindParam(":tmdb_tv_id", $requestJson["tmdb_tv_id"]);
+          $stmt->bindParam(":season_number", $requestJson["season_number"]);
+          $stmt->bindParam(":episode_number", $requestJson["episode_number"]);
+          $stmt->execute();
+          while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $tv_episode_id = $row["id"];
+            break;
+          }
+        }
       } else {
         $stmt = $dbh->prepare("UPDATE tv_episodes SET title=:title, air_date=:air_date, tmdb_tv_id=:tmdb_tv_id, season_number=:season_number, episode_number=:episode_number, still_path=:still_path WHERE id=:tv_episode_id");
         $stmt->bindParam(":tv_episode_id", $requestJson["tv_episode_id"]);
