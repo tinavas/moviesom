@@ -4,6 +4,7 @@
    * Expects JSON as payload I.e.:
    *  {
    *    "title": "Fight Club"
+   *    "genres": [{"id":12,"name":"Adventure"},{"id":16,"name":"Animation"}],
    *    "original_title": "Fight Club"
    *    "runtime": 139,
    *    "tmdb_id": 7468,
@@ -37,7 +38,7 @@
       if ($dbh->inTransaction() === false) {
         $dbh->beginTransaction();
       }
-      
+
       $stmt = $dbh->prepare("SELECT * FROM movie_ratings WHERE movie_id=(SELECT m.id FROM movies AS m JOIN movie_sources AS ms ON ms.movie_id=m.id WHERE m.id=:id OR ms.tmdb_id=:tmdb_id OR ms.imdb_id=:imdb_id GROUP BY m.id LIMIT 1)");
       $stmt->bindParam(":id", $requestJson["id"]);
       $stmt->bindParam(":tmdb_id", $requestJson["tmdb_id"]);
@@ -72,6 +73,19 @@
         $stmt->bindParam(":movie_id", $movie_id);
         $stmt->bindParam(":backdrop_path", $requestJson["backdrop_path"]);
         $stmt->bindParam(":poster_path", $requestJson["poster_path"]);
+        $stmt->execute();
+      }
+      
+      // Insert movie genres
+      foreach($requestJson['genres'] as $value) {
+        $stmt = $dbh->prepare("INSERT INTO movie_genres 
+                                (movie_id, movie_tmdb_id, movie_imdb_id, genre_tmdb_id) 
+                                VALUES 
+                                (:movie_id, :movie_tmdb_id, :movie_imdb_id, :genre_tmdb_id)");
+        $stmt->bindParam(":movie_id", $movie_id);
+        $stmt->bindParam(":movie_tmdb_id", $requestJson['tmdb_id']);
+        $stmt->bindParam(":movie_imdb_id", $requestJson['imdb_id']);
+        $stmt->bindParam(":genre_tmdb_id", $value["id"]);
         $stmt->execute();
       }
       
