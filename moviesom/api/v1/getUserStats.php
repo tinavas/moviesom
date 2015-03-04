@@ -65,8 +65,9 @@
                               GROUP BY g.id");
       $stmt->bindParam(":user_id", $userId);
       $stmt->execute();
+      $userStats["movie_genres_stats"] = [];
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $userStats["movie_genres_stats"] = $row;
+        array_push($userStats["movie_genres_stats"], $row);
       }
       
       $stmt = $dbh->prepare("SELECT SUM(times_watched) AS episodes_seen,
