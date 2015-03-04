@@ -56,7 +56,7 @@
         $userStats["movie_stats"] = $row;
       }
       
-      $stmt = $dbh->prepare("SELECT g.genre, COUNT(g.id) AS num 
+      $stmt = $dbh->prepare("SELECT g.genre, (COUNT(g.id) * um.watched) AS num 
                               FROM genres AS g 
                                 JOIN movie_genres AS mg ON mg.genre_tmdb_id=g.tmdb_id
                                 JOIN movies AS m ON m.id=mg.movie_id
