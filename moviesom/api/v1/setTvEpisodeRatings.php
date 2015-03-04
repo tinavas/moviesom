@@ -55,7 +55,12 @@
       // We create the episode to obtain a episode id if it doesn't exist already.
       if(isset($tv_episode_id) === false) {
         // Insert record into tv
-        $stmt = $dbh->prepare("INSERT INTO tv_episodes (title, air_date, tmdb_tv_id, season_number, episode_number, still_path) VALUES (:title, :air_date, :tmdb_tv_id, :season_number, :episode_number, :still_path)");
+        $stmt = $dbh->prepare("INSERT INTO tv_episodes 
+                                (title, air_date, tmdb_tv_id, season_number, episode_number, still_path) 
+                                VALUES 
+                                (:title, :air_date, :tmdb_tv_id, :season_number, :episode_number, :still_path)
+                                ON DUPLICATE KEY UPDATE
+                                  title=:title, air_date=:air_date, tmdb_tv_id=:tmdb_tv_id, season_number=:season_number, episode_number=:episode_number, still_path=:still_path");
         $stmt->bindParam(":title", $requestJson["title"]);
         $stmt->bindParam(":air_date", $requestJson["air_date"]);
         $stmt->bindParam(":tmdb_tv_id", $requestJson["tmdb_tv_id"]);
