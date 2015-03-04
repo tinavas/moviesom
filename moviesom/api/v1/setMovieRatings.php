@@ -79,7 +79,7 @@
       // Insert movie genres
       if(isset($requestJson['genres'])) {
         foreach($requestJson['genres'] as $value) {
-          $stmt = $dbh->prepare("INSERT INTO movie_genres 
+          $stmt = $dbh->prepare("INSERT IGNORE INTO movie_genres 
                                   (movie_id, movie_tmdb_id, movie_imdb_id, genre_tmdb_id) 
                                   VALUES 
                                   (:movie_id, :movie_tmdb_id, :movie_imdb_id, :genre_tmdb_id)");
