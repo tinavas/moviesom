@@ -63,7 +63,7 @@
                                 JOIN users_movies AS um ON um.movie_id=m.id
                               WHERE um.user_id=:user_id AND um.watched>0
                               GROUP BY g.id
-                              ORDER BY num ASC");
+                              ORDER BY num DESC");
       $stmt->bindParam(":user_id", $userId);
       $stmt->execute();
       $userStats["movie_genres_stats"] = [];
