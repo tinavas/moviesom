@@ -28,10 +28,6 @@
     $stmt->execute();
     $stmt = $dbh->prepare("TRUNCATE TABLE cinema_cities_nl");
     $stmt->execute();
-    $stmt = $dbh->prepare("TRUNCATE TABLE cinema_movies_nl");
-    $stmt->execute();
-    $stmt = $dbh->prepare("TRUNCATE TABLE cinema_cities_movies_nl");
-    $stmt->execute();
     $stmt = $dbh->prepare("TRUNCATE TABLE cinema_dates_nl");
     $stmt->execute();
     echo $execTime->getTime() . PHP_EOL;
@@ -40,19 +36,18 @@
     // Populate cities into the DB
     $stmt = $dbh->prepare("INSERT IGNORE INTO cinema_cities_nl (belbios_id, name) VALUES (:belbios_id, :name)");
     $stmt2 = $dbh->prepare("INSERT IGNORE INTO cinemas_nl (belbios_id, name, city_id, city_name) VALUES (:belbios_id, :name, :city_id, :city_name)");
-    $stmt3 = $dbh->prepare("INSERT IGNORE INTO cinema_movies_nl (belbios_id, title) VALUES (:belbios_id, :title)");
-    $stmt4 = $dbh->prepare("INSERT IGNORE INTO cinema_cities_movies_nl (city_id, city_name, movie_id, movie_name) VALUES (:city_id, :city_name, (SELECT id FROM cinema_movies_nl WHERE belbios_id=:movie_belbios_id), :movie_name)");
     $stmt5 = $dbh->prepare("INSERT IGNORE INTO cinema_dates_nl (city_id, city_name, cinema_id, cinema_name, movie_belbios_id, movie_name, movie_date, movie_time, timestamp) VALUES (:city_id, :city_name, :cinema_id, :cinema_name, :movie_belbios_id, :movie_name, :movie_date, :movie_time, :timestamp)");
     foreach($jsonCities as $key=>$value) {
       $stmt->bindParam(":belbios_id", $value["belbios_id"]);
       $stmt->bindParam(":name", $value["name"]);
       $stmt->execute();
       $city_id = $dbh->lastInsertId();
-      echo $execTime->getTime() . PHP_EOL;
-      echo "Cities {$value["name"]} inserted" . PHP_EOL;
+      //echo $execTime->getTime() . PHP_EOL;
+      //echo "Cities {$value["name"]} inserted" . PHP_EOL;
       
       // Populate the cinemas per city.
       $jsonCityCinemas = json_decode(queryBelbios("http://www.belbios.nl/ajax/cinemas/{$value["belbios_id"]}/0"), true);
+      echo "http://www.belbios.nl/ajax/cinemas/{$value["belbios_id"]}/0" . PHP_EOL;
       foreach($jsonCityCinemas as $key2=>$value2) {
         $stmt2->bindParam(":belbios_id", $value2["belbios_id"]);
         $stmt2->bindParam(":name", $value2["name"]);
@@ -61,28 +56,14 @@
         $stmt2->execute();
         $cinema_id = $dbh->lastInsertId();
         echo $execTime->getTime() . PHP_EOL;
-        echo "Cinema {$value2["name"]} inserted" . PHP_EOL;
+        echo "{$value2["name"]} inserted" . PHP_EOL;
         
         // Populate the movies per cinema
-        $jsonMovies = json_decode(queryBelbios("http://www.belbios.nl/ajax/movies/{$value2["belbios_id"]}"), true);
-        foreach($jsonMovies as $key3=>$value3) {
-          $stmt3->bindParam(":belbios_id", $value3["belbios_id"]);
-          $stmt3->bindParam(":title", $value3["title"]);
-          $stmt3->execute();
-          echo $execTime->getTime() . PHP_EOL;
-          echo "Movies {$value3["title"]} inserted" . PHP_EOL;
-          
-          // Populate the movies per city
-          $stmt4->bindParam(":city_id", $city_id);
-          $stmt4->bindParam(":city_name", $value["name"]);
-          $stmt4->bindParam(":movie_belbios_id", $value3["belbios_id"]);
-          $stmt4->bindParam(":movie_name", $value3["title"]);
-          $stmt4->execute();
-          echo $execTime->getTime() . PHP_EOL;
-          echo "City {$value["name"]} -> Movie {$value3["title"]} inserted" . PHP_EOL;
-          
+        $jsonMovies = json_decode(queryBelbios("http://www.belbios.nl/ajax/movies/{$value["belbios_id"]}/{$value2["belbios_id"]}"), true);
+        echo "http://www.belbios.nl/ajax/movies/{$value2["belbios_id"]}" . PHP_EOL;
+        foreach($jsonMovies as $key3=>$value3) {          
           $jsonDates = json_decode(queryBelbios("http://www.belbios.nl/ajax/dates/{$value2["belbios_id"]}/{$value3["belbios_id"]}"), true);
-          echo "http://www.belbios.nl/ajax/dates/{$value2["belbios_id"]}/{$value3["belbios_id"]}";
+          //echo "http://www.belbios.nl/ajax/dates/{$value2["belbios_id"]}/{$value3["belbios_id"]}";
           foreach($jsonDates as $key4=>$value4) {
             // Populate the movie dates per cinema
             $stmt5->bindParam(":city_id", $city_id);
