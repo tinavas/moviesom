@@ -4,6 +4,20 @@
    * Expects JSON as payload I.e.:
    *  {
    *    "title": "Fight Club"
+   *    "alternative_titles": {
+   *      titles: [{
+   *      "iso_3166_1": "BR",
+   *        "title": "Insurgente"
+   *      },
+   *      {
+   *        "iso_3166_1": "US",
+   *        "title": "Mineral"
+   *      },
+   *      {
+   *        "iso_3166_1": "US",
+   *        "title": "Insurgent"
+   *      }] 
+   *    },
    *    "genres": [{"id":12,"name":"Adventure"},{"id":16,"name":"Animation"}],
    *    "original_title": "Fight Club"
    *    "runtime": 139,
@@ -87,6 +101,21 @@
           $stmt->bindParam(":movie_tmdb_id", $requestJson['tmdb_id']);
           $stmt->bindParam(":movie_imdb_id", $requestJson['imdb_id']);
           $stmt->bindParam(":genre_tmdb_id", $value["id"]);
+          $stmt->execute();
+        }
+      }
+      
+      // Insert alternative titles
+      if(isset($requestJson['alternative_titles'])) {
+        $titles = $requestJson['alternative_titles']["titles"];
+        foreach($titles as $value) {
+          $stmt = $dbh->prepare("INSERT IGNORE INTO movie_alternative_titles
+                                  (movie_id, iso_3166_1, title) 
+                                  VALUES 
+                                  (:movie_id, :iso_3166_1, :title)");
+          $stmt->bindParam(":movie_id", $movie_id);
+          $stmt->bindParam(":iso_3166_1", $value["iso_3166_1"]);
+          $stmt->bindParam(":title", $value["title"]);
           $stmt->execute();
         }
       }
