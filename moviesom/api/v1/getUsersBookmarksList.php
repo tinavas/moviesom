@@ -56,7 +56,10 @@
                               users_movies AS um 
                                 JOIN movies AS m ON m.id=um.movie_id
                               WHERE um.user_id=:user_id
-                                AND m.title LIKE :search_title 
+                                AND (m.title LIKE :search_title 
+                                  OR m.original_title LIKE :search_title 
+                                  OR um.movie_id=
+                                    (SELECT movie_id FROM movie_alternative_titles WHERE title LIKE :search_title))
                                 AND want_to_watch>0
                               UNION ALL
                               SELECT te.id
@@ -86,7 +89,9 @@
                               FROM movie_ratings AS mr
                                 JOIN movies AS m ON m.id=mr.movie_id
                                 JOIN users_movies AS um ON um.movie_id=m.id
-                              WHERE um.user_id=:user_id AND m.title LIKE :search_title
+                              WHERE um.user_id=:user_id AND (m.title LIKE :search_title
+                                  OR m.original_title LIKE :search_title 
+                                  OR m.id=(SELECT movie_id FROM movie_alternative_titles WHERE title LIKE :search_title))
                                 AND want_to_watch>0
                                 AND um.tmdb_id=mr.source_id
                               UNION ALL

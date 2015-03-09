@@ -149,7 +149,9 @@
                               users_movies AS um 
                                 JOIN movies AS m ON m.id=um.movie_id
                               WHERE um.user_id=:user_id
-                                AND (m.title LIKE :search_title OR m.original_title LIKE :search_title)
+                                AND (m.title LIKE :search_title 
+                                  OR m.original_title LIKE :search_title
+                                  OR m.id=(SELECT movie_id FROM movie_alternative_titles WHERE title LIKE :search_title))
                                 AND (
                                   {$filterString}
                                 )
@@ -190,7 +192,9 @@
                                 JOIN users_movies AS um ON um.movie_id=m.id
                                 LEFT JOIN recommend_movies AS rm ON rm.tmdb_id=um.tmdb_id
                               WHERE um.user_id=:user_id 
-                                AND (m.title LIKE :search_title OR m.original_title LIKE :search_title)
+                                AND (m.title LIKE :search_title 
+                                  OR m.original_title LIKE :search_title
+                                  OR m.id=(SELECT movie_id FROM movie_alternative_titles WHERE title LIKE :search_title))
                                 AND (
                                   {$filterString}
                                 )
