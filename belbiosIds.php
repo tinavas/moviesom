@@ -6,7 +6,7 @@
     $stmt->bindParam(":title", $searchString);
     $stmt->execute();
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-      return "{$row["title"]} {$row["tmdb_id"]} {$row["imdb_id"]}" . PHP_EOL;
+      return "{$row["title"]} {$row["id"]} {$row["tmdb_id"]} {$row["imdb_id"]}" . PHP_EOL;
     }
     return null;
   }
@@ -22,7 +22,7 @@
       $movie = getMovie($title, $stmt);
     }
     if($movie == null) {
-      $title = str_ireplace([", the", ", de"], "", $title);
+      $title = str_ireplace([", the", ", de", ", a", ", het", ", la", ", il", ", les",  ", le", ", l'", ", une", ", een"], "", $title);
       $movie = getMovie($title, $stmt);
     }
     if($movie == null) {
@@ -30,8 +30,8 @@
       $movie = getMovie($title, $stmt);
     }
     
-    if($movie == null) {
-      echo $title . PHP_EOL;
+    if($movie != null) {
+      echo $movie . PHP_EOL;
     }
 
     return $movie;
@@ -46,7 +46,7 @@
     
     // Populate cities into the DB
     $stmt = $dbh->prepare("SELECT id, movie_name FROM cinema_dates_nl GROUP BY movie_belbios_id");
-    $stmt2 = $dbh->prepare("SELECT * FROM movies AS m JOIN movie_sources AS ms ON ms.movie_id=m.id 
+    $stmt2 = $dbh->prepare("SELECT m.id, m.title, ms.tmdb_id, ms.imdb_id FROM movies AS m JOIN movie_sources AS ms ON ms.movie_id=m.id 
                             WHERE m.title LIKE :title
                               OR m.original_title LIKE :title
                               OR m.id=(SELECT movie_id FROM movie_alternative_titles WHERE title LIKE :title LIMIT 1)");
