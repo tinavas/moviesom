@@ -38,15 +38,11 @@
       $stmt->execute();
       
       $token = $credentials ->generateNewLoginToken();
-      $stmt = $dbh->prepare("INSERT login_tokens (user_id, token, ip, user_agent, app) 
-                              VALUES ((SELECT id FROM users WHERE username=:username AND password=:password LIMIT 1), :token, :ip, :user_agent, :app) 
-                              ON DUPLICATE KEY UPDATE token=:token");
+      $stmt = $dbh->prepare("INSERT login_tokens (user_id, token, ip) VALUES ((SELECT id FROM users WHERE username=:username AND password=:password LIMIT 1), :token, :ip) ON DUPLICATE KEY UPDATE token=:token");
       $stmt->bindParam(":username", $requestJson["username"]);
       $stmt->bindParam(":password", $bCryptPw);
       $stmt->bindParam(":token", $token);
       $stmt->bindParam(":ip", $_SERVER['REMOTE_ADDR']);
-      $stmt->bindParam(":user_agent", $requestJson['user_agent']);
-      $stmt->bindParam(":app", $requestJson['app']);
       $stmt->execute();
       
       if($dbh->commit()) {

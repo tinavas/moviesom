@@ -151,7 +151,7 @@
                               WHERE um.user_id=:user_id
                                 AND (m.title LIKE :search_title 
                                   OR m.original_title LIKE :search_title
-                                  OR m.id=(SELECT movie_id FROM movie_alternative_titles WHERE title LIKE :search_title LIMIT 1))
+                                  OR m.id=(SELECT movie_id FROM movie_alternative_titles WHERE title LIKE :search_title))
                                 AND (
                                   {$filterString}
                                 )
@@ -194,7 +194,7 @@
                               WHERE um.user_id=:user_id 
                                 AND (m.title LIKE :search_title 
                                   OR m.original_title LIKE :search_title
-                                  OR m.id=(SELECT movie_id FROM movie_alternative_titles WHERE title LIKE :search_title LIMIT 1))
+                                  OR m.id=(SELECT movie_id FROM movie_alternative_titles WHERE title LIKE :search_title))
                                 AND (
                                   {$filterString}
                                 )
