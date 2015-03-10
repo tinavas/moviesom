@@ -44,12 +44,12 @@
     }
     
     // Populate cities into the DB
-    $stmt = $dbh->prepare("SELECT movie_belbios_id, movie_name FROM cinema_dates_nl GROUP BY movie_belbios_id");
+    $stmt = $dbh->prepare("SELECT movie_belbios_id, movie_name, timestamp FROM cinema_dates_nl GROUP BY movie_belbios_id");
     $stmt2 = $dbh->prepare("SELECT m.id, m.title, ms.tmdb_id, ms.imdb_id, m.runtime FROM movies AS m JOIN movie_sources AS ms ON ms.movie_id=m.id 
                             WHERE m.title LIKE :title
                               OR m.original_title LIKE :title
                               OR m.id=(SELECT movie_id FROM movie_alternative_titles WHERE title LIKE :title LIMIT 1)");
-    $stmt3 = $dbh->prepare("UPDATE cinema_dates_nl SET movie_moviesom_id=:movie_moviesom_id, runtime=:runtime WHERE movie_belbios_id=:movie_belbios_id");
+    $stmt3 = $dbh->prepare("UPDATE cinema_dates_nl SET movie_moviesom_id=:movie_moviesom_id, runtime=:runtime, timestamp_end=:timestamp_end WHERE movie_belbios_id=:movie_belbios_id");
     $stmt->execute();
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
       $movieSom = findMovie($row["movie_name"], $stmt2);
@@ -57,6 +57,8 @@
       if($movieSom != null) {
         $stmt3->bindParam(":movie_moviesom_id", $movieSom["movie_moviesom_id"]);
         $stmt3->bindParam(":runtime", $movieSom["runtime"]);
+        $timestampEnd  = $row["timestamp"] + ($movieSom["runtime"] * 60);
+        $stmt3->bindParam(":timestamp_end", $timestampEnd);
         $stmt3->bindParam(":movie_belbios_id", $row["movie_belbios_id"]);
         $stmt3->execute();
       }
