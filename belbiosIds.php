@@ -2,39 +2,38 @@
   require_once('lib/config.php');
 
   function getMovie($title, $stmt) {
+    $result = null;
     $searchString = "%" . $title . "%";
     $stmt->bindParam(":title", $searchString);
     $stmt->execute();
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-      return "{$row["title"]} {$row["id"]} {$row["tmdb_id"]} {$row["imdb_id"]}" . PHP_EOL;
+      $result = [];
+      $result["movie_moviesom_id"] = $row["id"];
+      $result["runtime"] = $row["runtime"];
     }
-    return null;
+    return $result;
   }
   
   function findMovie($title, $stmt) {
-    $movie = getMovie($title, $stmt);
-    if($movie == null) {
+    $movieSom = getMovie($title, $stmt);
+    if($movieSom == null) {
       $title = str_ireplace([", 2d", ", 3d", " 2d", " 3d", " IMAX"], "", $title);
-      $movie = getMovie($title, $stmt);
+      $movieSom = getMovie($title, $stmt);
     }
-    if($movie == null) {
+    if($movieSom == null) {
       $title = str_ireplace([", nl", ", ov", " nl", " ov"], "", $title);
-      $movie = getMovie($title, $stmt);
+      $movieSom = getMovie($title, $stmt);
     }
-    if($movie == null) {
+    if($movieSom == null) {
       $title = str_ireplace([", the", ", de", ", a", ", het", ", la", ", il", ", les",  ", le", ", l'", ", une", ", een"], "", $title);
-      $movie = getMovie($title, $stmt);
+      $movieSom = getMovie($title, $stmt);
     }
-    if($movie == null) {
+    if($movieSom == null) {
       $title = str_ireplace([" (12 jaar)"], "", $title);
-      $movie = getMovie($title, $stmt);
-    }
-    
-    if($movie != null) {
-      echo $movie . PHP_EOL;
+      $movieSom = getMovie($title, $stmt);
     }
 
-    return $movie;
+    return $movieSom;
   }
   
   try {
@@ -45,14 +44,22 @@
     }
     
     // Populate cities into the DB
-    $stmt = $dbh->prepare("SELECT id, movie_name FROM cinema_dates_nl GROUP BY movie_belbios_id");
-    $stmt2 = $dbh->prepare("SELECT m.id, m.title, ms.tmdb_id, ms.imdb_id FROM movies AS m JOIN movie_sources AS ms ON ms.movie_id=m.id 
+    $stmt = $dbh->prepare("SELECT movie_belbios_id, movie_name FROM cinema_dates_nl GROUP BY movie_belbios_id");
+    $stmt2 = $dbh->prepare("SELECT m.id, m.title, ms.tmdb_id, ms.imdb_id, m.runtime FROM movies AS m JOIN movie_sources AS ms ON ms.movie_id=m.id 
                             WHERE m.title LIKE :title
                               OR m.original_title LIKE :title
                               OR m.id=(SELECT movie_id FROM movie_alternative_titles WHERE title LIKE :title LIMIT 1)");
+    $stmt3 = $dbh->prepare("UPDATE cinema_dates_nl SET movie_moviesom_id=:movie_moviesom_id, runtime=:runtime WHERE movie_belbios_id=:movie_belbios_id");
     $stmt->execute();
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-      findMovie($row["movie_name"], $stmt2);
+      $movieSom = findMovie($row["movie_name"], $stmt2);
+      
+      if($movieSom != null) {
+        $stmt3->bindParam(":movie_moviesom_id", $movieSom["movie_moviesom_id"]);
+        $stmt3->bindParam(":runtime", $movieSom["runtime"]);
+        $stmt3->bindParam(":movie_belbios_id", $row["movie_belbios_id"]);
+        $stmt3->execute();
+      }
     }
     
     if($dbh->commit()) {
