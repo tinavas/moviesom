@@ -78,6 +78,32 @@
       $stmt->bindParam(":note", $requestJson["note"], PDO::PARAM_STR);
       $stmt->execute();
 
+      if($requestJson["watched"] == 1) {
+        // Select all the other users who recommended this movie to this user.
+        $stmt = $dbh->prepare("SELECT m.title, rm.recommend_by, rm.recommend_to, u.username AS recommender, u2.username AS viewer FROM recommend_movies AS rm
+                                  JOIN movie_sources AS ms ON ms.tmdb_id=rm.tmdb_id
+                                  JOIN movies AS m ON m.id=ms.movie_id
+                                  JOIN users AS u ON u.id=rm.recommend_by
+                                  JOIN users AS u2 ON u2.id=rm.recommend_to
+                                WHERE rm.tmdb_id=:tmdb_id AND recommend_to=:user_id AND watched=0");
+        $stmt->bindParam(":user_id", $userId);
+        $stmt->bindParam(":tmdb_id", $tmdb_id);
+        $stmt->execute();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+          // Award points to all users who recommended this movie.
+          $points = 10;
+          $credentials->addPoints($row['recommend_by'], $points);
+          $movieSomMail->mailRecommendPoints($row['recommender'], $row['viewer'], $row['title'], $points);
+        }
+        
+        // Set watched to 1 so it will never be awarded points again.
+        $stmt = $dbh->prepare("UPDATE recommend_movies SET watched=1 WHERE tmdb_id=:tmdb_id AND recommend_to=:user_id");
+        $stmt->bindParam(":user_id", $userId);
+        $stmt->bindParam(":tmdb_id", $tmdb_id);
+        $stmt->execute();
+      }
+      
+      
       if($dbh->commit()) {
         header('HTTP/1.1 200 OK');
         $response['status'] = 200;
