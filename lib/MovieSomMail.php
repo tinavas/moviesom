@@ -8,7 +8,7 @@
     /**
      * Mail notification for points earned when movie recommendation is watched by target user.
      */
-    public function mailRecommendPoints($recommender, $viewer, $title, $points) {
+    public function mailRecommendPoints($recommender, $viewer, $tmdbId, $title, $points) {
       // To send HTML mail, the Content-type header must be set
       $headers  = 'MIME-Version: 1.0' . "\r\n";
       $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
@@ -71,7 +71,7 @@
         <tr>
           <td>
             <h3>Hi,</h3>
-            <p class="lead">{$viewer} has watched {$title} following your recommendation.</p>
+            <p class="lead">{$viewer} has watched <a href="https://app.moviesom.com?tmdbMovieId={$tmdbId}">{$title}</a> following your recommendation.</p>
             <!-- Callout Panel -->
             <p class="callout">
               MovieSom: Your movie sommelier. Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">MovieSom.com</a>!

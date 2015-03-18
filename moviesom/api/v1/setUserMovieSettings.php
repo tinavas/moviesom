@@ -93,7 +93,7 @@
           // Award points to all users who recommended this movie.
           $points = 10;
           $credentials->addPoints($row['recommend_by'], $points);
-          $movieSomMail->mailRecommendPoints($row['recommender'], $row['viewer'], $row['title'], $points);
+          $movieSomMail->mailRecommendPoints($row['recommender'], $row['viewer'], $tmdb_id, $row['title'], $points);
         }
         
         // Set watched to 1 so it will never be awarded points again.
