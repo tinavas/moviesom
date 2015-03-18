@@ -49,7 +49,7 @@
         <table bgcolor="#999999">
           <tr>
             <td><h1>MovieSom</h1></td>
-            <td align="right"><h6 class="collapse">Points</h6></td>
+            <td align="right"><h6 class="collapse">{$points} Points</h6></td>
           </tr>
         </table>
         </div>
