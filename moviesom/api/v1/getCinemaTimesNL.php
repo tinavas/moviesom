@@ -21,7 +21,11 @@
     try {
       $start = strtotime('today');
       $end = strtotime('tomorrow');
-      
+      if(isset($requestJson["timestamp"])) {
+        $start = strtotime('today', $requestJson["timestamp"]);
+        $end = strtotime('tomorrow', $requestJson["timestamp"]);
+      }
+
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       if ($dbh->inTransaction() === false) {
