@@ -85,7 +85,7 @@
                                   JOIN movies AS m ON m.id=ms.movie_id
                                   JOIN users AS u ON u.id=rm.recommend_by
                                   JOIN users AS u2 ON u2.id=rm.recommend_to
-                                WHERE rm.tmdb_id=:tmdb_id AND recommend_to=:user_id AND watched=0");
+                                WHERE rm.tmdb_id=:tmdb_id AND recommend_to=:user_id AND is_watched=0");
         $stmt->bindParam(":user_id", $userId);
         $stmt->bindParam(":tmdb_id", $tmdb_id);
         $stmt->execute();
@@ -97,7 +97,7 @@
         }
         
         // Set watched to 1 so it will never be awarded points again.
-        $stmt = $dbh->prepare("UPDATE recommend_movies SET watched=1 WHERE tmdb_id=:tmdb_id AND recommend_to=:user_id");
+        $stmt = $dbh->prepare("UPDATE recommend_movies SET is_watched=1 WHERE tmdb_id=:tmdb_id AND recommend_to=:user_id");
         $stmt->bindParam(":user_id", $userId);
         $stmt->bindParam(":tmdb_id", $tmdb_id);
         $stmt->execute();
