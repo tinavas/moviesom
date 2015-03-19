@@ -49,7 +49,7 @@
                             WHERE m.title LIKE :title
                               OR m.original_title LIKE :title
                               OR m.id=(SELECT movie_id FROM movie_alternative_titles WHERE title LIKE :title LIMIT 1)");
-    $stmt3 = $dbh->prepare("UPDATE cinema_dates_nl SET movie_moviesom_id=:movie_moviesom_id, runtime=:runtime, timestamp_end=(timestamp + :timestamp_end) WHERE movie_belbios_id=:movie_belbios_id");
+    $stmt3 = $dbh->prepare("UPDATE cinema_dates_nl SET movie_moviesom_id=:movie_moviesom_id, timestamp_end=(timestamp + :timestamp_end) WHERE movie_belbios_id=:movie_belbios_id");
     $stmt->execute();
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
       $movieSom = findMovie($row["movie_name"], $stmt2);
