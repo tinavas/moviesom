@@ -56,7 +56,6 @@
       
       if($movieSom != null) {
         $stmt3->bindParam(":movie_moviesom_id", $movieSom["movie_moviesom_id"]);
-        $stmt3->bindParam(":runtime", $movieSom["runtime"]);
         $timestampEnd  = $movieSom["runtime"] * 60;
         $stmt3->bindParam(":timestamp_end", $timestampEnd);
         $stmt3->bindParam(":movie_belbios_id", $row["movie_belbios_id"]);
