@@ -103,7 +103,7 @@
             <p>Note: this link is only valid for 24 hours.</p>
             <!-- Callout Panel -->
             <p class="callout">
-              MovieSom: Your movie sommelier. Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">MovieSom.com</a>!
+              MovieSom: Have you seen it? Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">MovieSom.com</a>!
             </p><!-- /Callout Panel -->
                         
             <!-- social & contact -->

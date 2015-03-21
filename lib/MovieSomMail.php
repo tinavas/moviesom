@@ -71,7 +71,7 @@
             <p>You can also log in on <a href="{$protocol}://app.moviesom.com/">MovieSom.com</a> and find the recommendation in your Personal Collection overview.</p>
             <!-- Callout Panel -->
             <p class="callout">
-              MovieSom: Your movie sommelier. Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">MovieSom.com</a>!
+              MovieSom: Have you seen it? Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">MovieSom.com</a>!
             </p><!-- /Callout Panel -->
                         
             <!-- social & contact -->
@@ -220,7 +220,7 @@ EOT;
             <p class="lead">{$viewer} has watched <a href="https://app.moviesom.com?tmdbMovieId={$tmdbId}">{$title}</a> following your recommendation.</p>
             <!-- Callout Panel -->
             <p class="callout">
-              MovieSom: Your movie sommelier. Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">MovieSom.com</a>!
+              MovieSom: Have you seen it? Find it at <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}">MovieSom.com</a>!
             </p><!-- /Callout Panel -->
                         
             <!-- social & contact -->
