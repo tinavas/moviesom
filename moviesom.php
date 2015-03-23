@@ -87,7 +87,7 @@ $html = <<<EOT
     <meta property="og:image" content="{$meta['image']}"/>
     <meta property="og:site_name" content="MovieSom - Your movie sommelier"/>
     <meta property="og:description" content="{$meta['description']}"/>
-    <meta property="og:url" content="{$protocol}://app.moviesom.com/{$uri}"/>
+    <meta property="og:url" content="{$protocol}://www.moviesom.com/{$uri}"/>
     <link rel="image_src" href="{$meta['image']}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{$meta['description']}"/>
