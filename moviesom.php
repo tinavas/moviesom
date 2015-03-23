@@ -49,7 +49,7 @@
         $dbh->beginTransaction();
       }
       $stmt = $dbh->prepare("SELECT * FROM tv
-                              JOIN tv_sources AS ts ON ms.tv_id=tv.id
+                              JOIN tv_sources AS ts ON ts.tv_id=tv.id
                               WHERE ts.tmdb_id=:tmdb_id");
       $stmt->bindParam(":tmdb_id", $_REQUEST["tmdbTvId"]);
       $stmt->execute();
