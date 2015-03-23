@@ -12,7 +12,7 @@
     "description" => $description
   ];
   if(isset($_REQUEST["tmdbMovieId"])) {
-    $uri = "?tmdbMovieId={$_REQUEST["tmdbMovieId"]}";
+    $uri = "?tmdbMovieId={$_REQUEST["tmdbMovieId"]}&description={$description}";
     try {
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -41,7 +41,7 @@
     }
 
   } else if(isset($_REQUEST["tmdbTvId"])) {
-    $uri = "?tmdbTvId={$_REQUEST["tmdbTvId"]}";
+    $uri = "?tmdbTvId={$_REQUEST["tmdbTvId"]}&description={$description}";
     try {
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
