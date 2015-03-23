@@ -87,7 +87,7 @@ $html = <<<EOT
     <meta property="og:image" content="{$meta['image']}"/>
     <meta property="og:site_name" content="MovieSom - Your movie sommelier"/>
     <meta property="og:description" content="{$meta['description']}"/>
-    <meta property="og:url" content="{$protocol}//app.moviesom.com/{$uri}"/>
+    <meta property="og:url" content="{$protocol}://app.moviesom.com/{$uri}"/>
     <link rel="image_src" href="{$meta['image']}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{$meta['description']}"/>
@@ -99,7 +99,7 @@ $html = <<<EOT
     <script src="js/lib/modernizr.js"></script>
   </head>
   <body>
-    <iframe src="{$protocol}//app.moviesom.com/{$uri}" frameborder="0" height="100%" width="100%"/>
+    <iframe src="{$protocol}://app.moviesom.com/{$uri}" frameborder="0" height="100%" width="100%"/>
     <script type="text/javascript" data-main="js/config" src="js/require.js"></script>
   </body>
 </html>
