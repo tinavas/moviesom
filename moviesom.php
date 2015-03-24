@@ -3,7 +3,7 @@
 
   header('HTTP/1.1 404 NOT FOUND');
   $uri = "";
-  $description = "Keep track of the seen and unseen";
+  $description = "MovieSom - Keep track of the seen and unseen";
   if(isset($_REQUEST["description"])) {
     $description = str_replace('"', '&quot;', $_REQUEST["description"]);
   }
