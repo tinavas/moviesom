@@ -34,8 +34,8 @@
       $stmt2 = $dbh->prepare("SELECT movie_belbios_id, movie_name FROM cinema_dates_nl 
                               WHERE timestamp>=:start AND timestamp<:end AND cinema_id=:cinema_id 
                               GROUP BY movie_belbios_id ORDER BY movie_name ASC");
-      $stmt3 = $dbh->prepare("SELECT movie_time, timestamp, timestamp_end, m.runtime, movie_moviesom_id FROM cinema_dates_nl AS cd
-                              JOIN movies AS m ON m.id=cd.movie_moviesom_id
+      $stmt3 = $dbh->prepare("SELECT movie_time, timestamp, timestamp_end, IF(m.runtime IS NULL, 0, m.runtime) AS runtime, movie_moviesom_id FROM cinema_dates_nl AS cd
+                              LEFT JOIN movies AS m ON m.id=cd.movie_moviesom_id
                               WHERE timestamp>=:start AND timestamp<:end AND cinema_id=:cinema_id AND movie_belbios_id=:movie_belbios_id 
                               ORDER BY movie_name ASC");
       $stmt2->bindParam(":cinema_id", $requestJson["cinema_id"]);
