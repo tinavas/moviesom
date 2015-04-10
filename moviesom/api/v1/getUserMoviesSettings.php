@@ -55,7 +55,11 @@
       if(strlen($tmdbWhereIn) == 0) $tmdbWhereIn = "NULL";
       $imdbWhereIn = (count($requestJson['movie_imdb_ids'])) ? implode(',', array_fill(0, count($requestJson['movie_imdb_ids']), '?')) : "";
       if(strlen($imdbWhereIn) == 0) $imdbWhereIn = "NULL";
-      $stmt = $dbh->prepare("SELECT * FROM users_movies WHERE user_id=? AND (movie_id IN({$movieWhereIn}) OR tmdb_id IN({$tmdbWhereIn}) OR imdb_id IN({$imdbWhereIn}))");
+      $stmt = $dbh->prepare("SELECT um.*, IF(cd.id IS NOT NULL, '1', '0') AS in_cinema FROM users_movies AS um
+                                LEFT JOIN cinema_dates_nl AS cd ON cd.movie_moviesom_id=um.movie_id 
+                              WHERE user_id=? 
+                              AND (movie_id IN({$movieWhereIn}) OR tmdb_id IN({$tmdbWhereIn}) OR imdb_id IN({$imdbWhereIn}))
+                              GROUP BY um.movie_id");
       $stmt->bindValue(1, $userId);
       $pos = 1;
       foreach ($requestJson['movie_ids'] as $k => $id) {
