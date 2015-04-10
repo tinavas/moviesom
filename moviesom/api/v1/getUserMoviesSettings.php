@@ -44,6 +44,9 @@
     if(isset($requestJson['movie_tmdb_ids']) == false) $requestJson['movie_tmdb_ids'] = [];
     if(isset($requestJson['movie_imdb_ids']) == false) $requestJson['movie_imdb_ids'] = [];
     try {
+      $start = strtotime('today');
+      $end = strtotime('tomorrow');
+
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       if ($dbh->inTransaction() === false) {
@@ -55,13 +58,15 @@
       if(strlen($tmdbWhereIn) == 0) $tmdbWhereIn = "NULL";
       $imdbWhereIn = (count($requestJson['movie_imdb_ids'])) ? implode(',', array_fill(0, count($requestJson['movie_imdb_ids']), '?')) : "";
       if(strlen($imdbWhereIn) == 0) $imdbWhereIn = "NULL";
-      $stmt = $dbh->prepare("SELECT um.*, IF(cd.id IS NOT NULL, '1', '0') AS in_cinema FROM users_movies AS um
+      $stmt = $dbh->prepare("SELECT um.*, MAX(IF(cd.id IS NOT NULL AND cd.timestamp>=? AND cd.timestamp<?, '1', '0')) AS in_cinema FROM users_movies AS um
                                 LEFT JOIN cinema_dates_nl AS cd ON cd.movie_moviesom_id=um.movie_id 
-                              WHERE user_id=? 
+                              WHERE user_id=?
                               AND (movie_id IN({$movieWhereIn}) OR tmdb_id IN({$tmdbWhereIn}) OR imdb_id IN({$imdbWhereIn}))
                               GROUP BY um.movie_id");
-      $stmt->bindValue(1, $userId);
-      $pos = 1;
+      $stmt->bindValue(1, $start);
+      $stmt->bindValue(2, $end);
+      $stmt->bindValue(3, $userId);
+      $pos = 3;
       foreach ($requestJson['movie_ids'] as $k => $id) {
         $pos++;
         $stmt->bindValue($pos, $id["id"]);
