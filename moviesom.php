@@ -56,7 +56,7 @@
       $stmt->execute();
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $meta["title"] = str_replace('"', '&quot;', $row["title"]);
-        $meta["image"] = "https://image.tmdb.org/t/p/original/{$row["backdrop_path"]}";
+        $meta["image"] = "http://image.tmdb.org/t/p/original/{$row["backdrop_path"]}";
       }
       
       
