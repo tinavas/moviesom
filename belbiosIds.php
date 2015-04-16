@@ -17,7 +17,7 @@
   function findMovie($title, $stmt) {
     $movieSom = getMovie($title, $stmt);
     if($movieSom == null) {
-      $title = str_ireplace([", 2d", ", 3d", " 2d", " 3d", " IMAX"], "", $title);
+      $title = str_ireplace([", 2d", ", 3d", " 2d", " 3d", " IMAX", "...", ".."], "", $title);
       $movieSom = getMovie($title, $stmt);
     }
     if($movieSom == null) {
@@ -29,7 +29,7 @@
       $movieSom = getMovie($title, $stmt);
     }
     if($movieSom == null) {
-      $title = str_ireplace([" (12 jaar)"], "", $title);
+      $title = str_ireplace([" (12 jaar)", " (16 jaar)"], "", $title);
       $movieSom = getMovie($title, $stmt);
     }
 
