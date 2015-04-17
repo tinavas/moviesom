@@ -36,10 +36,10 @@
       // Consented connections
       $stmt = $dbh->prepare("SELECT :user_id AS self_id, uc.*, u.id AS uid1, u2.id AS uid2, 
                                 u.username AS user1, u2.username AS user2,
-                                IF(18!=uc.user_id,
-                                    (SELECT recommend_to FROM recommend_movies WHERE recommend_to=uc.user_id AND tmdb_id=:tmdb_id),
-                                    IF(18!=uc.user_id2,
-                                      (SELECT recommend_to FROM recommend_movies WHERE recommend_to=uc.user_id2 AND tmdb_id=:tmdb_id),
+                                IF(:user_id!=uc.user_id,
+                                    (SELECT recommend_to FROM recommend_movies WHERE recommend_to=uc.user_id AND tmdb_id=:tmdb_id LIMIT 1),
+                                    IF(:user_id!=uc.user_id2,
+                                      (SELECT recommend_to FROM recommend_movies WHERE recommend_to=uc.user_id2 AND tmdb_id=:tmdb_id LIMIT 1),
                                       NULL)
                                 ) AS recommend_to
                               
