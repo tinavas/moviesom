@@ -27,7 +27,7 @@
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $meta["title"] = str_replace('"', '&quot;', $row["title"]);
         $img = str_replace("/", "", $row["backdrop_path"]);
-        $meta["image"] = "http://image.tmdb.org/t/p/original/{$img}";
+        $meta["image"] = "http://image.tmdb.org/t/p/w780/{$img}";
       }
       
       
@@ -90,6 +90,13 @@ $html = <<<EOT
     <meta property="og:site_name" content="MovieSom"/>
     <meta property="og:description" content="{$meta['description']}"/>
     <meta property="og:url" content="{$protocol}://www.moviesom.com/moviesom.php{$uri}"/>
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@moviesom" />
+    <meta name="twitter:title" content="{$meta['title']}" />
+    <meta name="twitter:image" content="{$meta['image']}" />
+    <meta name="twitter:url" content="{$protocol}://www.moviesom.com/moviesom.php{$uri}" />
+
     <link rel="image_src" href="{$meta['image']}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{$meta['description']}"/>
