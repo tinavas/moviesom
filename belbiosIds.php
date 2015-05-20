@@ -19,7 +19,7 @@
   }
   
   function stripLanguage($title) {
-    return str_ireplace([", nl", ", ov", " nl", " ov", " Deutsch"], "", $title);
+    return str_ireplace([", nl", ", ov", " nl", " ov", " Deutsch", " (Turks)", " (Bollywood)"], "", $title);
   }
   
   function stripArticle($title) {
