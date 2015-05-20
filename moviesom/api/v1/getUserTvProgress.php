@@ -39,9 +39,6 @@
     try {
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-      if ($dbh->inTransaction() === false) {
-        $dbh->beginTransaction();
-      }
       $tmdbWhereIn = (count($requestJson['tv_tmdb_ids'])) ? implode(',', array_fill(0, count($requestJson['tv_tmdb_ids']), '?')): "";
       if(strlen($tmdbWhereIn) == 0) $tmdbWhereIn = "NULL";
       $stmt = $dbh->prepare("SELECT te.tmdb_tv_id AS tmdb_id, tv.number_of_episodes, COUNT(*) AS watched FROM tv_episodes AS te 
@@ -91,12 +88,8 @@
       
       $response["message"] = $ratings;
       
-      if($dbh->commit()) {
-        header('HTTP/1.1 200 OK');
-        $response['status'] = 200;
-      } else {
-        $response['message'] = '';
-      }
+      header('HTTP/1.1 200 OK');
+      $response['status'] = 200;
     }
     catch(PDOException $e) {  
       $response['message'] = $e;

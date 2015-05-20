@@ -46,9 +46,6 @@
     
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-      if ($dbh->inTransaction() === false) {
-        $dbh->beginTransaction();
-      }
 
       $defaultFilter = "(watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0 OR recommend>0)";
       
@@ -248,12 +245,8 @@
       // Set the response results.
       $response["results"] = $usersMovies;
 
-      if($dbh->commit()) {
-        header('HTTP/1.1 200 OK');
-        $response['status'] = 200;
-      } else {
-        $response['message'] = '';
-      }
+      header('HTTP/1.1 200 OK');
+      $response['status'] = 200;
     }
     catch(PDOException $e) {  
       $response['message'] = $e;

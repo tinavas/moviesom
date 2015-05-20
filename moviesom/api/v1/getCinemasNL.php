@@ -24,9 +24,6 @@
       
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-      if ($dbh->inTransaction() === false) {
-        $dbh->beginTransaction();
-      }
       $stmt = $dbh->prepare("SELECT id, name FROM cinemas_nl WHERE city_id=:city_id ORDER BY name ASC");
       $stmt->bindParam(":city_id", $requestJson["city_id"]);
       $stmt->execute();
@@ -37,12 +34,8 @@
       $response["message"] = $cinemas;
       
       
-      if($dbh->commit()) {
-        header('HTTP/1.1 200 OK');
-        $response['status'] = 200;
-      } else {
-        $response['message'] = '';
-      }
+      header('HTTP/1.1 200 OK');
+      $response['status'] = 200;
     }
     catch(PDOException $e) {  
       $response['message'] = $e;

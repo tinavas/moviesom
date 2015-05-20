@@ -49,9 +49,6 @@
 
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-      if ($dbh->inTransaction() === false) {
-        $dbh->beginTransaction();
-      }
       $movieWhereIn = (count($requestJson['movie_ids'])) ? implode(',', array_fill(0, count($requestJson['movie_ids']), '?')) : "";
       if(strlen($movieWhereIn) == 0) $movieWhereIn = "NULL";
       $tmdbWhereIn = (count($requestJson['movie_tmdb_ids'])) ? implode(',', array_fill(0, count($requestJson['movie_tmdb_ids']), '?')): "";
@@ -86,12 +83,8 @@
       }
       $response["message"] = $usersMovies;
       
-      if($dbh->commit()) {
-        header('HTTP/1.1 200 OK');
-        $response['status'] = 200;
-      } else {
-        $response['message'] = '';
-      }
+      header('HTTP/1.1 200 OK');
+      $response['status'] = 200;
     }
     catch(PDOException $e) {  
       $response['message'] = $e;

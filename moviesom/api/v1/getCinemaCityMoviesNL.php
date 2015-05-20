@@ -24,9 +24,6 @@
       
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-      if ($dbh->inTransaction() === false) {
-        $dbh->beginTransaction();
-      }
       $stmt = $dbh->prepare("SELECT movie_belbios_id, movie_name, runtime FROM willim_moviesom.cinema_dates_nl AS cd
                             LEFT JOIN movies AS m ON m.id=cd.movie_moviesom_id
                             WHERE city_id=:city_id
@@ -44,12 +41,8 @@
       $response["message"] = $movies;
       
       
-      if($dbh->commit()) {
-        header('HTTP/1.1 200 OK');
-        $response['status'] = 200;
-      } else {
-        $response['message'] = '';
-      }
+      header('HTTP/1.1 200 OK');
+      $response['status'] = 200;
     }
     catch(PDOException $e) {  
       $response['message'] = $e;
