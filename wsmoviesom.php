@@ -3,10 +3,9 @@
   require_once('lib/password_compat/password.php');
   
   /**
-   * Credentials
+   * Mail
    */
   $movieSomMail = $dice->create('MovieSomMail');
-
   
   $version = "v1";
   if(isset($_REQUEST['v'])) {
