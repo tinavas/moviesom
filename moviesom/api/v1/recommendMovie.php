@@ -76,6 +76,10 @@
             $title = $row["title"];
           }
 
+          if(strlen($title) == 0) {
+            $title = $requestJson["title"];
+          }
+          
           // When new recommendation we send an e-mail.
           if($recommendId != 0) {
             $movieSomMail->mailRecommendation($mailFrom, $mailTo, $requestJson["movie_tmdb_id"], $title);
