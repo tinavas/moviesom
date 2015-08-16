@@ -4,6 +4,7 @@
    * Expects JSON as payload I.e.:
    *  {
    *    "token": "d967a19940bdc4d498d0420a9fb12802ab5857a0a634ab73ae8984c5cf46ab3f9322dd5c1c3f069cc9d226ce47112747976c289cf6ae7b41a8ac72a7dc69c83f"
+   *    "filter_connection": "18",
    *    "watched_filter": "true",
    *    "blu_ray_filter": "false",
    *    "dvd_filter": "false",
@@ -28,7 +29,25 @@
   
   $loggedIn = $credentials->hasMoviesomAccess();
   $userId = $credentials->getUserId();
+  if(isset($requestJson['filter_connection']) && isConnection($db, $userId, $requestJson['filter_connection'])) {
+    $userId = $requestJson['filter_connection'];
+  }
 
+  function isConnection($db, $userId, $connectionId) {
+    $dbh = $db->connect();
+    $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $stmt = $dbh->prepare("SELECT * FROM users_connections 
+                            WHERE consent=1 AND consent2=1 AND
+                              ((user_id=:user_id AND user_id2=:connection_id) OR ((user_id2=:user_id AND user_id=:connection_id)))");
+    $stmt->bindParam(":user_id", $userId);
+    $stmt->bindParam(":connection_id", $connectionId);
+    $stmt->execute();
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+      return true;
+    }
+    return false;
+  }
+  
   // We need at least one of the following arrays in order to proceed with searching.
   if($loggedIn === false) {
     header('HTTP/1.1 401 Unauthorized');
@@ -62,6 +81,11 @@
       if(isset($requestJson["watched_filter"]) && strcasecmp($requestJson["watched_filter"], "true") == 0) {
         $defaultFilter = "";
         $filterString .= "OR watched>0 ";
+      }
+      
+      if(isset($requestJson["want_to_watch_filter"]) && strcasecmp($requestJson["want_to_watch_filter"], "true") == 0) {
+        $defaultFilter = "";
+        $filterString .= "OR want_to_watch>0 ";
       }
       
       if(isset($requestJson["blu_ray_filter"]) && strcasecmp($requestJson["blu_ray_filter"], "true") == 0) {
