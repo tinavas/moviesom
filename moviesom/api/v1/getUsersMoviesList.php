@@ -29,8 +29,12 @@
   
   $loggedIn = $credentials->hasMoviesomAccess();
   $userId = $credentials->getUserId();
+  $moviePersonalMeta = "um.watched, um.want_to_watch, um.blu_ray, um.dvd, um.digital, um.other, um.lend_out, um.recommend, ";
+  $tvPersonalMeta = "ute.watched, ute.want_to_watch, ute.blu_ray, ute.dvd, ute.digital, ute.other, ute.lend_out, ute.recommend, ";
   if(isset($requestJson['filter_connection']) && isConnection($db, $userId, $requestJson['filter_connection'])) {
     $userId = $requestJson['filter_connection'];
+    $moviePersonalMeta = "0 AS watched, 0 AS want_to_watch, 0 AS blu_ray, 0 AS dvd, 0 AS digital, 0 AS other, '' AS lend_out, 0 AS recommend, ";
+    $tvPersonalMeta = "0 AS watched, 0 AS want_to_watch, 0 AS blu_ray, 0 AS dvd, 0 AS digital, 0 AS other, '' AS lend_out, 0 AS recommend, ";
   }
 
   function isConnection($db, $userId, $connectionId) {
@@ -205,7 +209,7 @@
                                 m.id, m.title, m.runtime, '' AS number_of_episodes, '' as number_of_seasons, release_date, '' AS last_air_date,
                                 backdrop_path, poster_path, '' AS episode_title, '' AS season_number, '' AS episode_number, '' AS air_date,
                                 um.tmdb_id, mr.rating, mr.votes, mr.updated, um.imdb_id,
-                                um.watched, um.want_to_watch, um.blu_ray, um.dvd, um.digital, um.other, um.lend_out, um.recommend, 
+                                {$moviePersonalMeta}
                                 um.added, um.updated AS user_updated, rm.added AS recommend_date,
                                 'movie' AS media_type
                               FROM movie_ratings AS mr
@@ -227,7 +231,7 @@
                                 tv.id AS tv_id, tv.title, tv.episode_run_time AS runtime, tv.number_of_episodes, tv.number_of_seasons,
                                 tv.first_air_date, tv.last_air_date, tv.backdrop_path, tv.poster_path, te.title AS episode_title,
                                 te.season_number, te.episode_number, te.air_date, te.tmdb_tv_id AS tmdb_id, ter.rating, ter.votes, ter.updated, ute.imdb_id,
-                                ute.watched, ute.want_to_watch, ute.blu_ray, ute.dvd, ute.digital, ute.other, ute.lend_out, ute.recommend, 
+                                {$tvPersonalMeta}
                                 ute.added, ute.updated AS user_updated, null AS recommend_date,
                                 'tv' AS media_type
                               FROM users_tv_episodes AS ute
