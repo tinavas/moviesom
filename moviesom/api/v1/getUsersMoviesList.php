@@ -81,12 +81,8 @@
        * FILTER
        */
       $filterString = "";
+      $watchedString = "";
       $orWhereString = "";
-      if(isset($requestJson["watched_filter"]) && strcasecmp($requestJson["watched_filter"], "true") == 0) {
-        $defaultFilter = "";
-        $filterString .= "OR watched>0 ";
-      }
-      
       if(isset($requestJson["want_to_watch_filter"]) && strcasecmp($requestJson["want_to_watch_filter"], "true") == 0) {
         $defaultFilter = "";
         $filterString .= "OR want_to_watch>0 ";
@@ -127,6 +123,20 @@
         $filterString .= "OR CHAR_LENGTH(note)>0 ";
         $orWhereString .= " OR note LIKE :search_title ";
       }
+      if(isset($requestJson["watched_filter"]) && strcasecmp($requestJson["watched_filter"], "true") == 0) {
+        $defaultFilter = "";
+        if(strlen($filterString) > 0) {
+          $watchedString = "AND (watched>0) ";
+        } else {
+          $filterString = "OR watched>0 ";
+        }
+      } else {
+        if(strlen($filterString) > 0) {
+          $watchedString = "AND (watched=0) ";
+        }
+      }
+      
+
       
       $filterString .= $defaultFilter;
       $OR = "OR";
@@ -156,6 +166,9 @@
               $sortString .= "ORDER BY user_updated DESC";
             }
             break;
+          case "sort_watched":
+            $sortString .= "ORDER BY watched DESC";
+            break;
           default:
             $sortString = "ORDER BY title";
             break;
@@ -180,6 +193,7 @@
                                 AND (
                                   {$filterString}
                                 )
+                                {$watchedString}
                                 {$orWhereString}
                               UNION ALL
                               SELECT te.id
@@ -193,6 +207,7 @@
                                 AND (
                                   {$filterString}
                                 )
+                                {$watchedString}
                                 {$orWhereString}
                               ) subquery");
       $stmt->bindParam(":user_id", $userId);
@@ -223,6 +238,7 @@
                                 AND (
                                   {$filterString}
                                 )
+                                {$watchedString}
                                 {$orWhereString}
                                 AND um.tmdb_id=mr.source_id
                                 GROUP BY m.id
@@ -245,6 +261,7 @@
                                 AND (
                                   {$filterString}
                                 )
+                                {$watchedString}
                                 {$orWhereString}
                                 AND ter.source_id=tes.tmdb_id
                               GROUP BY tv.id) subquery
