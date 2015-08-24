@@ -41,7 +41,8 @@
                                     IF(:user_id!=uc.user_id2,
                                       (SELECT recommend_to FROM recommend_movies WHERE recommend_to=uc.user_id2 AND tmdb_id=:tmdb_id LIMIT 1),
                                       NULL)
-                                ) AS recommend_to
+                                ) AS recommend_to,
+                                (SELECT IF(spoiler IS NOT NULL, spoiler, '') FROM recommend_movies WHERE recommend_by=user_id AND tmdb_id=:tmdb_id LIMIT 1) AS spoiler
                               
                               FROM users_connections AS uc
                                 JOIN users AS u ON u.id=uc.user_id

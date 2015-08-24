@@ -42,10 +42,11 @@
       foreach($requestJson["recommend_to"] as $recommend_to) {
         if(strcasecmp($recommend_to["recommend"], "1") == 0) {
           // Recommend movie insertion
-          $stmt = $dbh->prepare("INSERT IGNORE INTO recommend_movies (recommend_by, recommend_to, tmdb_id) 
-                                  VALUES (:user_id, :recommend_to, :tmdb_id)");
+          $stmt = $dbh->prepare("INSERT IGNORE INTO recommend_movies (recommend_by, recommend_to, tmdb_id, spoiler) 
+                                  VALUES (:user_id, :recommend_to, :tmdb_id, :spoiler)");
           $stmt->bindParam(":tmdb_id", $requestJson["movie_tmdb_id"]);
           $stmt->bindParam(":recommend_to", $recommend_to["id"]);
+          $stmt->bindParam(":spoiler", $requestJson["spoiler"]);
           $stmt->bindParam(":user_id", $userId);
           $stmt->execute();
           $recommendId = $dbh->lastInsertId();
@@ -82,7 +83,18 @@
           
           // When new recommendation we send an e-mail.
           if($recommendId != 0) {
-            $movieSomMail->mailRecommendation($mailFrom, $mailTo, $requestJson["movie_tmdb_id"], $title);
+            $movieSomMail->mailRecommendation($mailFrom, $mailTo, $requestJson["movie_tmdb_id"], $title);            
+          } else {
+            // We update the spoiler text.
+            $stmt = $dbh->prepare("UPDATE recommend_movies SET spoiler=:spoiler WHERE 
+                                    recommend_by=:user_id 
+                                    AND recommend_to=:recommend_to 
+                                    AND tmdb_id=:tmdb_id");
+            $stmt->bindParam(":tmdb_id", $requestJson["movie_tmdb_id"]);
+            $stmt->bindParam(":recommend_to", $recommend_to["id"]);
+            $stmt->bindParam(":spoiler", $requestJson["spoiler"]);
+            $stmt->bindParam(":user_id", $userId);
+            $stmt->execute();
           }
 
         } else {
