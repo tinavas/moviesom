@@ -40,7 +40,8 @@
       $stmt = $dbh->prepare("SELECT u.username, rm.tmdb_id, rm.spoiler FROM recommend_movies AS rm 
                                 JOIN users AS u ON rm.recommend_by=u.id
                               WHERE rm.tmdb_id=:tmdb_id
-                                AND (rm.recommend_to=:user_id OR rm.recommend_by=:user_id)");
+                                AND (rm.spoiler IS NOT NULL AND rm.spoiler<>'')
+                                AND (rm.recommend_to=:user_id OR rm.recommend_by=:user_id) GROUP BY recommend_by");
       $stmt->bindValue(":tmdb_id", $requestJson['tmdb_id']);
       $stmt->bindParam(":user_id", $userId);
       $stmt->execute();
