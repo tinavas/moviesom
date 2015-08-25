@@ -134,8 +134,8 @@
         <tr>
           <td align="center">
             <p>
-              <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/terms.php">Terms</a> |
-              <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/privacy.php">Privacy</a>
+              <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/20150825195537terms.txt">Terms</a> |
+              <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/20150303203238privacy.txt">Privacy</a>
             </p>
           </td>
         </tr>
@@ -283,8 +283,8 @@ EOT;
         <tr>
           <td align="center">
             <p>
-              <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/terms.php">Terms</a> |
-              <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/privacy.php">Privacy</a>
+              <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/20150825195537terms.txt">Terms</a> |
+              <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/20150303203238privacy.txt">Privacy</a>
             </p>
           </td>
         </tr>
@@ -436,8 +436,8 @@ EOT;
         <tr>
           <td align="center">
             <p>
-              <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/terms.php">Terms</a> |
-              <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/privacy.php">Privacy</a>
+              <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/20150825195537terms.txt">Terms</a> |
+              <a href="{$protocol}://{$_SERVER["SERVER_NAME"]}/20150303203238privacy.txt">Privacy</a>
             </p>
           </td>
         </tr>
