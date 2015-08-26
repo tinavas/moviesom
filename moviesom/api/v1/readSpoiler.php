@@ -41,7 +41,7 @@
                               FROM recommend_movies AS rm
                                 JOIN movie_sources AS ms ON ms.tmdb_id=rm.tmdb_id
                                 JOIN movies AS m ON m.id=ms.movie_id
-                              WHERE rm.id=:recommend_id AND rm.recommend_by=:user_id AND rm.is_spoiler_read=0");
+                              WHERE rm.id=:recommend_id AND rm.recommend_to=:user_id AND rm.is_spoiler_read=0");
       $stmt->bindParam(":recommend_id", $requestJson["recommend_id"]);
       $stmt->bindParam(":user_id", $userId);
       $stmt->execute();
