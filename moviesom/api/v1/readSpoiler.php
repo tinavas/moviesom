@@ -48,7 +48,7 @@
       
       $title = "";
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $stmt2 = $dbh->prepare("UPDATE recommend_movies SET is_spoiler_read=1 WHERE id=:recommend_id AND recommend_by=:user_id AND is_spoiler_read=0");
+        $stmt2 = $dbh->prepare("UPDATE recommend_movies SET is_spoiler_read=1 WHERE id=:recommend_id AND recommend_to=:user_id AND is_spoiler_read=0");
         $stmt2->bindParam(":recommend_id", $requestJson["recommend_id"]);
         $stmt2->bindParam(":user_id", $userId);
         $stmt2->execute();
