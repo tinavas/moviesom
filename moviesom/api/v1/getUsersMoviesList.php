@@ -5,12 +5,15 @@
    *  {
    *    "token": "d967a19940bdc4d498d0420a9fb12802ab5857a0a634ab73ae8984c5cf46ab3f9322dd5c1c3f069cc9d226ce47112747976c289cf6ae7b41a8ac72a7dc69c83f"
    *    "filter_connection": "18",
+   *    "all_filter": "true",
    *    "watched_filter": "true",
    *    "blu_ray_filter": "false",
    *    "dvd_filter": "false",
    *    "digital_filter": "false",
    *    "other_filter": "false",
    *    "lend_out_filter": "false",
+   *    "note_filter": "false",
+   *    "spoiler_filter": "false",
    *    "page": 0,
    *  }
    */
@@ -120,23 +123,24 @@
       
       if(isset($requestJson["note_filter"]) && strcasecmp($requestJson["note_filter"], "true") == 0) {
         $defaultFilter = "";
-        $filterString .= "OR CHAR_LENGTH(note)>0 ";
-        $orWhereString .= " OR note LIKE :search_title ";
+        $filterString .= "OR (CHAR_LENGTH(note)>0 AND note LIKE :search_title) ";
       }
+      
+      if(isset($requestJson["spoiler_filter"]) && strcasecmp($requestJson["spoiler_filter"], "true") == 0) {
+        $defaultFilter = "";
+        $filterString .= "OR (CHAR_LENGTH(spoiler)>0 AND spoiler LIKE :search_title)";
+      }
+      
       if(!isset($requestJson["all_filter"]) || strcasecmp($requestJson["all_filter"], "true") != 0) {
         if(isset($requestJson["watched_filter"]) && strcasecmp($requestJson["watched_filter"], "true") == 0) {
           $defaultFilter = "";
           if(strlen($filterString) > 0) {
             $watchedString = "AND (watched>0) ";
-          } else {
-            $filterString = "OR watched>0 ";
           }
         } else {
           $defaultFilter = "";
           if(strlen($filterString) > 0) {
             $watchedString = "AND (watched=0) ";
-          } else {
-            $filterString = "OR watched=0 ";
           }
         }
       }
@@ -194,6 +198,8 @@
                               FROM
                               users_movies AS um 
                                 JOIN movies AS m ON m.id=um.movie_id
+                                LEFT JOIN movie_sources AS ms ON ms.movie_id=m.id
+                                LEFT JOIN recommend_movies AS rm ON rm.tmdb_id=ms.tmdb_id
                               WHERE um.user_id=:user_id
                                 AND (m.title LIKE :search_title 
                                   OR m.original_title LIKE :search_title
@@ -202,7 +208,6 @@
                                   {$filterString}
                                 )
                                 {$watchedString}
-                                {$orWhereString}
                               UNION ALL
                               SELECT te.id
                               FROM
@@ -210,13 +215,13 @@
                                 JOIN tv_episodes AS te ON ute.tv_episode_id=te.id
                                 JOIN tv_sources AS ts ON ts.tmdb_id=te.tmdb_tv_id
                                 JOIN tv ON tv.id=ts.tv_id
+                                LEFT JOIN recommend_movies AS rtv ON rtv.id IS NULL
                               WHERE ute.user_id=:user_id
                                 AND (tv.title LIKE :search_title OR te.title LIKE :search_title)
                                 AND (
                                   {$filterString}
                                 )
                                 {$watchedString}
-                                {$orWhereString}
                               ) subquery");
       $stmt->bindParam(":user_id", $userId);
       $stmt->bindParam(":search_title", $searchString, PDO::PARAM_STR);
@@ -233,7 +238,7 @@
                                 backdrop_path, poster_path, '' AS episode_title, '' AS season_number, '' AS episode_number, '' AS air_date,
                                 um.tmdb_id, mr.rating, mr.votes, mr.updated, um.imdb_id,
                                 {$moviePersonalMeta}
-                                um.added, um.updated AS user_updated, rm.added AS recommend_date,
+                                um.added, um.updated AS user_updated, rm.added AS recommend_date, rm.spoiler,
                                 'movie' AS media_type
                               FROM movie_ratings AS mr
                                 JOIN movies AS m ON m.id=mr.movie_id
@@ -247,7 +252,6 @@
                                   {$filterString}
                                 )
                                 {$watchedString}
-                                {$orWhereString}
                                 AND um.tmdb_id=mr.source_id
                                 GROUP BY m.id
                               UNION ALL
@@ -256,7 +260,7 @@
                                 tv.first_air_date, tv.last_air_date, tv.backdrop_path, tv.poster_path, te.title AS episode_title,
                                 te.season_number, te.episode_number, te.air_date, te.tmdb_tv_id AS tmdb_id, ter.rating, ter.votes, ter.updated, ute.imdb_id,
                                 {$tvPersonalMeta}
-                                ute.added, ute.updated AS user_updated, null AS recommend_date,
+                                ute.added, ute.updated AS user_updated, null AS recommend_date, rtv.spoiler,
                                 'tv' AS media_type
                               FROM users_tv_episodes AS ute
                                 JOIN tv_episode_sources AS tes ON tes.tmdb_id=ute.tmdb_id
@@ -264,13 +268,13 @@
                                 JOIN tv_episode_ratings AS ter ON ter.tv_episode_id=te.id
                                 JOIN tv_sources AS ts ON ts.tmdb_id=te.tmdb_tv_id
                                 JOIN tv ON tv.id=ts.tv_id
+                                LEFT JOIN recommend_movies AS rtv ON rtv.id IS NULL
                               WHERE ute.user_id=:user_id
                                 AND (tv.title LIKE :search_title OR tv.original_title LIKE :search_title OR te.title LIKE :search_title )
                                 AND (
                                   {$filterString}
                                 )
                                 {$watchedString}
-                                {$orWhereString}
                                 AND ter.source_id=tes.tmdb_id
                               GROUP BY tv.id) subquery
                               {$sortString}
