@@ -128,7 +128,7 @@
       
       if(isset($requestJson["spoiler_filter"]) && strcasecmp($requestJson["spoiler_filter"], "true") == 0) {
         $defaultFilter = "";
-        $filterString .= "OR (CHAR_LENGTH(spoiler)>0 AND spoiler LIKE :search_title)";
+        $filterString .= "OR (CHAR_LENGTH(spoiler)>0 AND spoiler LIKE :search_title AND recommend_to=:user_id)";
       }
       
       if(!isset($requestJson["all_filter"]) || strcasecmp($requestJson["all_filter"], "true") != 0) {
