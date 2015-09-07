@@ -83,8 +83,29 @@
           
           // When new recommendation we send an e-mail.
           if($recommendId != 0) {
-            $movieSomMail->mailRecommendation($mailFrom, $mailTo, $requestJson["movie_tmdb_id"], $title);            
+            $hasSpoiler = (strlen($requestJson["spoiler"])>0) ? true : false;
+            $movieSomMail->mailRecommendation($mailFrom, $mailTo, $requestJson["movie_tmdb_id"], $title, $hasSpoiler);            
           } else {
+            // Check if a spoiler has been added or modified
+            if(strlen($requestJson["spoiler"]) > 0) {
+              $stmt = $dbh->prepare("SELECT id FROM recommend_movies WHERE 
+                                      recommend_by=:user_id
+                                      AND recommend_to=:recommend_to
+                                      AND tmdb_id=:tmdb_id
+                                      AND spoiler!=:spoiler");
+              $stmt->bindParam(":spoiler", $requestJson["spoiler"]);
+              $stmt->bindParam(":recommend_to", $recommend_to["id"]);
+              $stmt->bindParam(":user_id", $userId);
+              $stmt->bindParam(":tmdb_id", $requestJson["movie_tmdb_id"]);
+              $stmt->execute();
+              
+              while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                // Send notice of added Spoiler.
+                $movieSomMail->mailSpoilerAdded($mailFrom, $mailTo, $requestJson["movie_tmdb_id"], $title);  
+                break;
+              }
+            }
+            
             // We update the spoiler text.
             $stmt = $dbh->prepare("UPDATE recommend_movies SET spoiler=:spoiler WHERE 
                                     recommend_by=:user_id 
