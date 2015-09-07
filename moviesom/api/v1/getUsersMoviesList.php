@@ -133,13 +133,13 @@
       
       if(!isset($requestJson["all_filter"]) || strcasecmp($requestJson["all_filter"], "true") != 0) {
         if(isset($requestJson["watched_filter"]) && strcasecmp($requestJson["watched_filter"], "true") == 0) {
-          $defaultFilter = "";
           if(strlen($filterString) > 0) {
+            $defaultFilter = "";
             $watchedString = "AND (watched>0) ";
           }
         } else {
-          $defaultFilter = "";
           if(strlen($filterString) > 0) {
+            $defaultFilter = "";
             $watchedString = "AND (watched=0) ";
           }
         }
