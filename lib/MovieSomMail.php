@@ -112,7 +112,7 @@ EOT;
         'MIME-Version' => '1.0',
         'Content-type' => 'text/html; charset=iso-8859-1',
         'To' => $mailTo,
-        'Subject' => 'Movie recommendation');
+        'Subject' => 'Movie spoiler added');
 
       $calloutPanel = $this->getCalloutPanel();
       $social = $this->getSocial();
@@ -151,7 +151,7 @@ EOT;
         <table bgcolor="#333">
           <tr>
             <td><h6 class="collapse" style="color: white;">MovieSom</h6></td>
-            <td align="right"><h6 class="collapse" style="color: #999">Recommendation</h6></td>
+            <td align="right"><h6 class="collapse" style="color: #999">Spoiler</h6></td>
           </tr>
         </table>
       </div>
