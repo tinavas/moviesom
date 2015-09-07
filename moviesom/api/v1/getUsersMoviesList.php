@@ -70,7 +70,7 @@
       $dbh = $db->connect();
       $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-      $defaultFilter = "(watched>0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0 OR recommend>0)";
+      $defaultFilter = "(watched>=0 OR blu_ray>0 OR dvd>0 OR digital>0 OR other>0 OR recommend>0)";
       
       $searchString = "%%";
       if(isset($requestJson["query"])) {
@@ -123,17 +123,25 @@
         $filterString .= "OR CHAR_LENGTH(note)>0 ";
         $orWhereString .= " OR note LIKE :search_title ";
       }
-      if(isset($requestJson["watched_filter"]) && strcasecmp($requestJson["watched_filter"], "true") == 0) {
-        $defaultFilter = "";
-        if(strlen($filterString) > 0) {
-          $watchedString = "AND (watched>0) ";
+      if(!isset($requestJson["all_filter"]) || strcasecmp($requestJson["all_filter"], "true") != 0) {
+        if(isset($requestJson["watched_filter"]) && strcasecmp($requestJson["watched_filter"], "true") == 0) {
+          $defaultFilter = "";
+          if(strlen($filterString) > 0) {
+            $watchedString = "AND (watched>0) ";
+          } else {
+            $filterString = "OR watched>0 ";
+          }
         } else {
-          $filterString = "OR watched>0 ";
+          $defaultFilter = "";
+          if(strlen($filterString) > 0) {
+            $watchedString = "AND (watched=0) ";
+          } else {
+            $filterString = "OR watched=0 ";
+          }
         }
-      } else {
-        if(strlen($filterString) > 0) {
-          $watchedString = "AND (watched=0) ";
-        }
+      }
+      if(isset($requestJson["all_filter"]) && strcasecmp($requestJson["all_filter"], "true") == 0) {
+        $watchedString = "";
       }
       
 
