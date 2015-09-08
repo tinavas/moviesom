@@ -504,21 +504,21 @@ EOT;
         <p class="callout">
           MovieSom: Have you seen it? Find it at <a href="{$protocol}://www.moviesom.com">MovieSom.com</a>!
           <br/>
-          <a href="http://slideme.org/application/moviesom" target="_blank"><img alt="thumbnail" src="{$protocol}://www.moviesom.com/uploads/409/2015041914203379a3a92d34dd9ad2c9e7ced0ba94f2b389bdd269.png"></a>
+          <a href="http://slideme.org/application/moviesom" target="_blank"><img alt="thumbnail" border="0" src="{$protocol}://www.moviesom.com/uploads/409/2015041914203379a3a92d34dd9ad2c9e7ced0ba94f2b389bdd269.png"></a>
 
-          <a href="http://www.amazon.com/WilliM-MovieSom/dp/B00U7WNZJO/ref=sr_1_1?s=mobile-apps&amp;ie=UTF8&amp;qid=1429445566&amp;sr=1-1&amp;keywords=moviesom" target="_blank"><img alt="thumbnail" src="{$protocol}://www.moviesom.com/uploads/409/20150419141907b4c26bf2d8d2a6eeb08e0d23511288ab957c1a82.png"></a>
+          <a href="http://www.amazon.com/WilliM-MovieSom/dp/B00U7WNZJO/ref=sr_1_1?s=mobile-apps&amp;ie=UTF8&amp;qid=1429445566&amp;sr=1-1&amp;keywords=moviesom" target="_blank"><img alt="thumbnail" border="0" src="{$protocol}://www.moviesom.com/uploads/409/20150419141907b4c26bf2d8d2a6eeb08e0d23511288ab957c1a82.png"></a>
           
-          <a href="https://marketplace.firefox.com/app/moviesom" target="_blank"><img alt="thumbnail" src="{$protocol}://www.moviesom.com/uploads/409/2015041914155926f50b484d660f90c1efaf290dbc3f775e530499.png"></a>
+          <a href="https://marketplace.firefox.com/app/moviesom" target="_blank"><img alt="thumbnail" border="0" src="{$protocol}://www.moviesom.com/uploads/409/2015041914155926f50b484d660f90c1efaf290dbc3f775e530499.png"></a>
           
-          <a href="http://willemliu.store.aptoide.com/app/market/com.moviesom/8535826/MovieSom" target="_blank"><img alt="thumbnail" src="{$protocol}://www.moviesom.com/uploads/409/20150221014505e1b8759c35a42cefdb2d7b6073de0bc717c87cb9.png"></a>
+          <a href="http://willemliu.store.aptoide.com/app/market/com.moviesom/8535826/MovieSom" target="_blank"><img alt="thumbnail" border="0" src="{$protocol}://www.moviesom.com/uploads/409/20150221014505e1b8759c35a42cefdb2d7b6073de0bc717c87cb9.png"></a>
           
-          <a href="http://windowsphone.com/s?appId=da583882-69a1-4228-bce2-ad94327642a6" target="_blank"><img alt="thumbnail" src="{$protocol}://www.moviesom.com/uploads/409/20150221004838a9f7e54c94f63044a684330cdc88523d0bb7f383.png"></a>
+          <a href="http://windowsphone.com/s?appId=da583882-69a1-4228-bce2-ad94327642a6" target="_blank"><img alt="thumbnail" border="0" src="{$protocol}://www.moviesom.com/uploads/409/20150221004838a9f7e54c94f63044a684330cdc88523d0bb7f383.png"></a>
           
-          <a href="https://play.google.com/store/apps/details?id=com.moviesom" target="_blank"><img alt="thumbnail" src="{$protocol}://www.moviesom.com/uploads/409/20150221004837c7377bfeed1711725186a950b3d8657a6733eb2e.png"></a>
+          <a href="https://play.google.com/store/apps/details?id=com.moviesom" target="_blank"><img alt="thumbnail" border="0" src="{$protocol}://www.moviesom.com/uploads/409/20150221004837c7377bfeed1711725186a950b3d8657a6733eb2e.png"></a>
           
-          <a href="{$protocol}://app.moviesom.com" target="_blank"><img alt="thumbnail" src="{$protocol}://www.moviesom.com/uploads/409/2015022523384041c3a0f1c0513ff5dafceb957f6f2579ff0d515f.png"></a>
+          <a href="{$protocol}://app.moviesom.com" target="_blank"><img alt="thumbnail" border="0" src="{$protocol}://www.moviesom.com/uploads/409/2015022523384041c3a0f1c0513ff5dafceb957f6f2579ff0d515f.png"></a>
           
-          <a href="{$protocol}://app.moviesom.com" target=""><img alt="thumbnail" src="{$protocol}://www.moviesom.com/uploads/409/20150422193219a1f40ac9bb9a558d8dfd3dc8bd06e7da65066cd9.png"></a>
+          <a href="{$protocol}://app.moviesom.com" target=""><img alt="thumbnail" border="0" src="{$protocol}://www.moviesom.com/uploads/409/20150422193219a1f40ac9bb9a558d8dfd3dc8bd06e7da65066cd9.png"></a>
         </p><!-- /Callout Panel -->
 EOT;
       
