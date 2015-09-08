@@ -88,7 +88,7 @@
           } else {
             // Check if a spoiler has been added or modified
             if(strlen($requestJson["spoiler"]) > 0) {
-              $stmt = $dbh->prepare("SELECT id FROM recommend_movies WHERE 
+              $stmt = $dbh->prepare("SELECT spoiler FROM recommend_movies WHERE 
                                       recommend_by=:user_id
                                       AND recommend_to=:recommend_to
                                       AND tmdb_id=:tmdb_id
@@ -101,7 +101,11 @@
               
               while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 // Send notice of added Spoiler.
-                $movieSomMail->mailSpoilerAdded($mailFrom, $mailTo, $requestJson["movie_tmdb_id"], $title);  
+                if(strlen($row["spoiler"]) > 0) {
+                  $movieSomMail->mailSpoilerUpdated($mailFrom, $mailTo, $requestJson["movie_tmdb_id"], $title);  
+                } else {
+                  $movieSomMail->mailSpoilerAdded($mailFrom, $mailTo, $requestJson["movie_tmdb_id"], $title);  
+                }
                 break;
               }
             }
